@@ -1,0 +1,229 @@
+use {
+    crate::*,
+    pulldown_cmark::{
+        self as pcm,
+        CowStr,
+        Event,
+        Parser,
+        Tag,
+        TagEnd,
+        html::push_html,
+    },
+    std::{
+        fmt::Write,
+        fs,
+        path::PathBuf,
+    },
+};
+
+pub struct Page {
+    pub title: String,
+    pub page_path: PagePath,
+    pub md_file_path: PathBuf,
+}
+
+impl Page {
+    pub fn new(
+        title: String,
+        page_path: PagePath,
+        md_file_path: PathBuf,
+    ) -> Self {
+        Self {
+            title,
+            page_path,
+            md_file_path,
+        }
+    }
+    /// Write the variable parts of the HTML `<head>`: the links to CSS, JS, meta tags, title, etc.
+    pub fn write_html_head(
+        &self,
+        html: &mut String,
+        project: &Project,
+    ) -> DdResult<()> {
+        html.push_str(HTML_START);
+        let title = format!("{} - {}", &self.title, &project.config.title);
+        writeln!(html, "<title>{}</title>", title)?; // TODO escape HTML
+        writeln!(html, "<meta name=\"og-title\" content=\"{}\">", title,)?;
+        if let Some(description) = &project.config.description {
+            writeln!(html, r#"<meta name="description" content="{description}">"#)?;
+        }
+        if let Some(url) = &project.config.favicon {
+            let url = project.img_url(url, &self.page_path);
+            writeln!(html, r#"<link rel="shortcut icon" href="{url}">"#)?;
+        }
+        for e in project.list_js()? {
+            let url = project.static_url("js", &e.filename, &self.page_path);
+            writeln!(html, r#"<script src="{}?m={}"></script>"#, url, e.mtime)?;
+        }
+        for e in project.list_css()? {
+            let url = project.static_url("css", &e.filename, &self.page_path);
+            writeln!(
+                html,
+                r#"<link href="{}?m={}" rel=stylesheet>"#,
+                url, e.mtime
+            )?;
+        }
+        html.push_str("</head>\n");
+        Ok(())
+    }
+
+    fn write_nav_links(
+        &self,
+        html: &mut String,
+        nav_links: &[MenuLinkConfig],
+        project: &Project,
+    ) -> DdResult<()> {
+        for link in nav_links {
+            html.push_str("<a class=\"nav-link ");
+            if let Some(class) = &link.class {
+                html.push_str(class);
+            }
+            html.push('\"');
+            if let Some(url) = &link.url {
+                let url = project.link_url(url, &self.page_path);
+                write!(html, " href=\"{url}\"")?;
+            }
+            html.push('>');
+            if let Some(img) = &link.img {
+                let img_url = project.img_url(img, &self.page_path);
+                write!(html, "<img src=\"{img_url}\"")?;
+                if let Some(alt) = &link.alt {
+                    write!(html, " alt=\"{alt}\"")?; // TODO escape HTML
+                    write!(html, " title=\"{alt}\"")?; // TODO escape HTML
+                }
+                html.push('>');
+            }
+            if let Some(label) = &link.label {
+                write!(html, "<span>{label}</span>")?; // TODO escape HTML
+            }
+            html.push_str("</a>\n");
+        }
+        Ok(())
+    }
+
+    /// Write the HTML `<header>` containing the site navigation menu
+    pub fn write_html_header(
+        &self,
+        html: &mut String,
+        project: &Project,
+    ) -> DdResult<()> {
+        html.push_str("<header>\n");
+        html.push_str("<nav class=before-menu>\n");
+        self.write_nav_links(html, &project.config.nav_links.before_menu, project)?;
+        html.push_str("</nav>\n");
+        project.config.menu.push_nav(html, project, &self.page_path);
+        html.push_str("<nav class=after-menu>\n");
+        self.write_nav_links(html, &project.config.nav_links.after_menu, project)?;
+        html.push_str("</nav>\n");
+        html.push_str("</header>\n");
+        Ok(())
+    }
+    /// Write the part of the HTML generated from the page's Markdown content
+    ///
+    /// The resulting html contains,
+    /// - at top level: an `<article>` element, which contains:
+    ///   - `<nav class=page-toc>` : the table of contents for the page
+    ///   - `<main>` : the main content of the page
+    pub fn write_html_article(
+        &self,
+        html: &mut String,
+        project: &Project,
+    ) -> DdResult<()> {
+        let mut toc = String::new(); // stores the LIs of the nav.page-toc
+
+        let md = fs::read_to_string(&self.md_file_path)?;
+        let mut events = Parser::new_ext(&md, pcm::Options::all()).collect::<Vec<_>>();
+        for i in 0..events.len() {
+            match &mut events[i] {
+                // Rewrite the image source
+                Event::Start(Tag::Image { dest_url, .. }) => {
+                    if let Some(new_url) = project.maybe_rewrite_img_url(dest_url, &self.page_path)
+                    {
+                        *dest_url = CowStr::from(new_url);
+                    }
+                }
+
+                // rewrite internal links
+                Event::Start(Tag::Link { dest_url, .. }) => {
+                    if let Some(new_url) = project.maybe_rewrite_link_url(dest_url, &self.page_path)
+                    {
+                        *dest_url = CowStr::from(new_url);
+                    }
+                }
+
+                _ => {}
+            }
+
+            // Generate IDs for headings if missing and
+            // generate the TOC's content
+            if let Event::Start(Tag::Heading { level, id, .. }) = &events[i] {
+                if id.is_none() {
+                    // Generate an ID from the heading text
+                    let mut heading_text = String::new();
+                    let mut j = i + 1;
+                    while j < events.len() {
+                        match &events[j] {
+                            Event::Text(text) => {
+                                heading_text.push_str(text);
+                            }
+                            Event::End(TagEnd::Heading(_)) => {
+                                break;
+                            }
+                            _ => {}
+                        }
+                        j += 1;
+                    }
+                    let new_id = heading_text
+                        .to_lowercase()
+                        .chars()
+                        .filter(|c| c.is_alphanumeric() || *c == ' ')
+                        .map(|c| if c == ' ' { '-' } else { c })
+                        .collect::<String>();
+                    writeln!(
+                        toc,
+                        "<li class=\"toc-item {level}\"><a href=#{new_id}>{heading_text}</a></li>"
+                    )?;
+                    if let Event::Start(Tag::Heading { id, .. }) = &mut events[i] {
+                        *id = Some(CowStr::from(new_id));
+                    } else {
+                        unreachable!();
+                    }
+                }
+            }
+        }
+
+        html.push_str("<article>\n");
+
+        // push the nav.page-toc
+        html.push_str("<aside class=page-nav>\n");
+        html.push_str("<nav class=page-toc>\n");
+        html.push_str("<a class=toc-title href=\"#top\">");
+        html.push_str(&self.title); // TODO escape HTML
+        html.push_str("</a>\n");
+        html.push_str("<ul class=toc-content>");
+        html.push_str(&toc);
+        html.push_str("</ul>");
+        html.push_str("</nav>\n");
+        html.push_str("</aside>\n");
+
+        // push the HTML matching the file's Markdown content
+        html.push_str("<main>\n");
+        push_html(html, events.into_iter());
+        html.push_str("</main>\n");
+
+        html.push_str("</article>\n");
+        Ok(())
+    }
+    pub fn write_html(
+        &self,
+        html: &mut String,
+        project: &Project,
+    ) -> DdResult<()> {
+        self.write_html_head(html, project)?;
+        html.push_str("<body>\n");
+        self.write_html_header(html, project)?; // header with logos & site-nav
+        self.write_html_article(html, project)?; // page-to & article
+        html.push_str("</html>\n");
+        Ok(())
+    }
+}
