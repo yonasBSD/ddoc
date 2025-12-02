@@ -216,9 +216,9 @@ impl Page {
             html.push_str("<ul class=toc-content>");
             html.push_str(&toc);
             html.push_str("</ul>");
-            html.push_str("</nav>\n");
-            html.push_str("</aside>\n");
         }
+        html.push_str("</nav>\n");
+        html.push_str("</aside>\n");
         // push the HTML matching the file's Markdown content
         html.push_str("<main>\n");
         push_html(html, events.into_iter());
