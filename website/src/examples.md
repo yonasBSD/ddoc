@@ -17,6 +17,16 @@ website: [https://dystroy.org/bacon](https://dystroy.org/bacon)
 
 Source: [https://github.com/Canop/bacon/tree/main/website](https://github.com/Canop/bacon/tree/main/website)
 
+# broot
+
+![broot](img/examples/broot.png)
+
+broot's website is similar to ddoc's too, but shows how a bigger documentation fits ddoc without problem
+
+website: [https://dystroy.org/broot](https://dystroy.org/broot)
+
+Source: [https://github.com/Canop/broot/tree/main/website](https://github.com/Canop/broot/tree/main/website)
+
 # rhit
 
 ![rhit](img/examples/rhit.png)
