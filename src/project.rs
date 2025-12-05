@@ -11,6 +11,7 @@ use {
             PathBuf,
         },
     },
+    termimad::crossterm::style::Stylize,
 };
 
 pub struct Project {
@@ -94,14 +95,29 @@ impl Project {
         file.write_all(html.as_bytes())?;
         Ok(())
     }
-
+    pub fn check_img_path(
+        &self,
+        img_path: &str, // a relative path like "img/xyz.png",
+        page_path: &PagePath,
+    ) {
+        let path = self.src_path.join(img_path);
+        if !path.exists() {
+            eprintln!(
+                "{}: {} contains a broken img src: {}",
+                "error".red().bold(),
+                page_path.to_string().yellow(),
+                img_path.to_string().red(),
+            );
+        }
+    }
     pub fn maybe_rewrite_img_url(
         &self,
         src: &str,
         page_path: &PagePath,
     ) -> Option<String> {
         // filtering to change only relative links to /img files
-        if let Some((_, before, path)) = regex_captures!(r"^(\.\./)*(img/.*)$", &src,) {
+        if let Some((_, before, path)) = regex_captures!(r"^(\.\./)*(img/.*)$", &src) {
+            self.check_img_path(src, page_path);
             let depth = page_path.depth();
             if depth == 0 && before.is_empty() {
                 return None; // no rewriting needed
@@ -125,8 +141,18 @@ impl Project {
             None => Cow::Borrowed(src),
         }
     }
+    /// Check if the given `PagePath` exists in the project,
+    /// write an error if it does not.
+    pub fn check_page_path(
+        &self,
+        page_path: &PagePath,
+    ) {
+        if !self.pages.contains_key(page_path) {
+            eprintln!("Error: link to non-existing page: {:?}", page_path);
+        }
+    }
     /// Return a modified link URL if it needs to be rewritten,
-    /// return None if no rewriting is needed.
+    /// return `None` if no rewriting is needed.
     pub fn maybe_rewrite_link_url(
         &self,
         src: &str,
@@ -144,13 +170,33 @@ impl Project {
             url.push_str(path);
             url.push_str(file);
             url.push_str(hash);
+            let dst_page_path = PagePath::from_path_stem(path, file);
+            if !self.pages.contains_key(&dst_page_path) {
+                eprintln!(
+                    "{}: {} contains a broken link: {}",
+                    "error".red(),
+                    page_path.to_string().yellow(),
+                    src.to_string().red(),
+                );
+            }
             return Some(url);
         }
         // rewrite relative internal links to .md files
         if let Some((_, path, file, _ext, hash)) =
             regex_captures!(r"^(\.\./|[\w\-/]+/)*([\w\-/]+)(\.md)?/?(#.*)?$", &src,)
         {
-            return Some(format!("{}{}{}", path, file, hash,));
+            let dst_page_path = page_path.follow_relative_link(path, file);
+            if !self.pages.contains_key(&dst_page_path) {
+                eprintln!(
+                    "{}: {} contains a broken relative link: {}",
+                    "error".red().bold(),
+                    page_path.to_string().yellow(),
+                    src.to_string().red(),
+                );
+            }
+            let file = if file == "index" { "" } else { file };
+            let url = format!("{}{}{}", path, file, hash,);
+            return Some(url);
         }
         None
     }
@@ -205,7 +251,7 @@ fn copy_normal_recursive(
         let Some(file_name) = file_name.to_str() else {
             continue;
         };
-        if file_name.starts_with(".") {
+        if file_name.starts_with('.') {
             continue;
         }
         let dest_path = dst_dir.join(file_name);

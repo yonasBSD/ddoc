@@ -30,6 +30,11 @@ pub struct Config {
 }
 
 impl Config {
+    /// Read the ddoc.hjson configuration file at the root of a ddoc project
+    ///
+    /// # Errors
+    /// Return `DdError::ConfigNotFound` if no ddoc.hjson is found at the specified path
+    /// or other `DdError` variants on read/parse errors
     pub fn at_root(path: &Path) -> DdResult<Self> {
         let config_path = path.join("ddoc.hjson");
         if !config_path.exists() {

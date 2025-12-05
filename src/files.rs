@@ -9,6 +9,11 @@ use {
 };
 
 /// Deserialize an object from a JSON, TOML, or HJSON file.
+///
+/// # Errors
+/// Return `DdError::Read` on file read errors, `DdError::UnsupportedFileFormat`
+/// if the file extension is not supported, and deserialization errors
+/// as appropriate.
 pub fn read_file<T, P: AsRef<Path>>(path: P) -> DdResult<T>
 where
     T: DeserializeOwned,

@@ -57,6 +57,11 @@ static TEMPLATE_GITHUB_NAVLINK: &str = r#"{
 
 /// Initialize a ddoc.hjson file in the specified directory
 /// (do nothing if one already exists)
+///
+/// # Errors
+/// Return `DdError::InvalidConfig` if an existing ddoc.hjson
+/// cannot be read, or other less likely `DdError` variants on
+/// write errors when creating a new ddoc.hjson
 pub fn init_hjson_in_dir(
     dir: &Path,
     init_values: &InitValues,

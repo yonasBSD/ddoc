@@ -48,14 +48,13 @@ pub fn rebuild_on_change(project_path: PathBuf) -> Result<RecommendedWatcher, no
                 }
                 eprintln!("Changes detected...");
                 match Project::load_and_build(&project_path) {
-                    Ok(_) => eprintln!("... {}", "site rebuilt successfully".green().bold()),
+                    Ok(()) => eprintln!("... {}", "site rebuilt successfully".green().bold()),
                     Err(e) => eprintln!("{}{}", "Error rebuilding site: ".red().bold(), e),
                 }
             }
             Err(e) => warn!("watch error: {e:?}"),
         })?;
     watcher.watch(&config_path, RecursiveMode::NonRecursive)?;
-    eprintln!("src path: {}", src_path.display());
     watcher.watch(&src_path, RecursiveMode::Recursive)?;
     Ok(watcher)
 }

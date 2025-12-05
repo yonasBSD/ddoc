@@ -30,7 +30,7 @@ impl StaticEntry {
                 let Some(file_name) = file_name.to_str() else {
                     continue;
                 };
-                if file_name.starts_with(".") {
+                if file_name.starts_with('.') {
                     continue;
                 }
                 if let Some(ext) = ext_filter {

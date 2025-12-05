@@ -13,12 +13,12 @@ pub fn serve_project(
     let static_path = project.build_path.clone();
     eprintln!(
         "Serving {} at {}",
-        project.config.title.to_string().yellow().bold(),
+        project.config.title.clone().yellow().bold(),
         format!("http://{addr}/").green().bold(),
     );
     let server = rouille::Server::new(addr, move |request| {
         // build the file path
-        let mut path = static_path.to_owned();
+        let mut path = static_path.clone();
         path.push(&request.url()[1..]); // Remove leading /
 
         if path.is_dir() {

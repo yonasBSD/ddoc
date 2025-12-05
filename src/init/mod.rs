@@ -14,22 +14,22 @@ use {
     crate::*,
     std::{
         fs,
-        path::PathBuf,
+        path::Path,
     },
     termimad::crossterm::style::Stylize,
 };
 
-pub fn init_ddoc_project(dir: PathBuf) -> DdResult<()> {
+pub fn init_ddoc_project(dir: &Path) -> DdResult<()> {
     // first check the directory is suitable
     if dir.exists() {
-        if CargoToml::in_dir(&dir).is_some() {
+        if CargoToml::in_dir(dir).is_some() {
             return Err(DdError::InitNotPossible(format!(
                 "Directory {} looks busy, you should probably init ddoc in a subdirectory",
                 dir.display()
             )));
         }
     } else {
-        fs::create_dir_all(&dir).map_err(|e| {
+        fs::create_dir_all(dir).map_err(|e| {
             DdError::InitNotPossible(format!(
                 "Failed to create directory {}: {}",
                 dir.display(),

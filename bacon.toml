@@ -42,6 +42,13 @@ command = [
 	"cargo", "clippy",
 	"--",
 	"-W", "clippy::pedantic",
+    "-A", "clippy::needless_raw_string_hashes",
+    "-A", "clippy::struct_excessive_bools",
+    "-A", "clippy::wildcard_imports",
+    "-A", "clippy::must_use_candidate",
+    "-A", "clippy::map_unwrap_or",
+    "-A", "clippy::uninlined_format_args",
+    "-A", "clippy::match_same_arms",
 ]
 need_stdout = false
 

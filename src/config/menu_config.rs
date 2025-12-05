@@ -91,7 +91,7 @@ impl Menu {
                     let link = first_page_path
                         .as_ref()
                         .map(|p| hosting_page_path.link_to(p))
-                        .unwrap_or("#".to_string());
+                        .unwrap_or_else(|| "#".to_string());
                     (link, false)
                 }
             };

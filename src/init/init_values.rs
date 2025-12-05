@@ -47,15 +47,13 @@ pub fn find_file_ignore_case(
     filename: &str,
 ) -> Option<PathBuf> {
     let filename_lower = filename.to_lowercase();
-    let read_dir = match std::fs::read_dir(dir) {
-        Ok(rd) => rd,
-        Err(_) => return None,
+    let Ok(read_dir) = std::fs::read_dir(dir) else {
+        return None;
     };
     for entry in read_dir.flatten() {
         let file_name_os = entry.file_name();
-        let file_name_str = match file_name_os.to_str() {
-            Some(s) => s,
-            None => continue,
+        let Some(file_name_str) = file_name_os.to_str() else {
+            continue;
         };
         if file_name_str.to_lowercase() == filename_lower {
             return Some(entry.path());

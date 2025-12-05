@@ -36,6 +36,9 @@ impl Page {
         }
     }
     /// Write the variable parts of the HTML `<head>`: the links to CSS, JS, meta tags, title, etc.
+    ///
+    /// # Errors
+    /// Return `DdError` variants on write errors, not on project config/data errors
     pub fn write_html_head(
         &self,
         html: &mut String,
@@ -139,12 +142,12 @@ impl Page {
     pub fn write_html_article(
         &self,
         html: &mut String,
-        md: String,
+        md: &str,
         project: &Project,
     ) -> DdResult<()> {
         let mut toc = String::new(); // stores the LIs of the nav.page-toc
 
-        let mut events = Parser::new_ext(&md, pcm::Options::all()).collect::<Vec<_>>();
+        let mut events = Parser::new_ext(md, pcm::Options::all()).collect::<Vec<_>>();
         for i in 0..events.len() {
             match &mut events[i] {
                 // Rewrite the image source
@@ -228,6 +231,10 @@ impl Page {
         Ok(())
     }
 
+    /// Write the full HTML for this page into the given `html` String
+    ///
+    /// # Errors
+    /// Return `DdError` variants on write errors, not on project config/data errors
     pub fn write_html(
         &self,
         html: &mut String,
@@ -245,7 +252,7 @@ impl Page {
         self.write_html_head(html, project)?;
         writeln!(html, "<body class=\"page-{}\">\n", &self.page_path.stem)?;
         self.write_html_header(html, project)?; // header with logos & site-nav
-        self.write_html_article(html, md, project)?; // page-to & article
+        self.write_html_article(html, &md, project)?; // page-to & article
         html.push_str("</html>\n");
         Ok(())
     }

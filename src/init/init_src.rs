@@ -6,6 +6,10 @@ use {
     },
 };
 
+/// Create and fill the `src/` directory in the given `dir`.
+///
+/// Break nothing, and don't write files if they don't look
+/// necessary
 pub fn init_src_in_dir(
     dir: &Path,
     init_values: &InitValues,

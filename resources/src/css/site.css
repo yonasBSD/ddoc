@@ -303,6 +303,9 @@ nav.site-nav .selected > a {
 nav.page-toc {
 	top: 80px;
 	position: sticky;
+	overflow-x: hidden;
+	overflow-y: auto;
+	max-height: calc(100vh - 90px);
 }
 
 nav.page-toc a.toc-title {

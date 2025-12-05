@@ -18,6 +18,54 @@ pub struct PagePath {
 }
 
 impl PagePath {
+    pub fn from_path_stem(
+        path: &str,
+        stem: &str,
+    ) -> Self {
+        let dir = path
+            .split('/')
+            .filter(|part| !part.is_empty())
+            .map(|s| s.to_owned())
+            .collect();
+        let stem = if stem.is_empty() {
+            "index".to_owned()
+        } else {
+            stem.to_owned()
+        };
+        Self { dir, stem }
+    }
+    /// Given a relative link (path and stem), return the new `PagePath`
+    /// obtained by following that link from this `PagePath`.
+    ///
+    /// If there are too many ".." parts in the path, Some of those will be ignored
+    /// (we don't go above the root).
+    pub fn follow_relative_link(
+        &self,
+        path: &str,
+        mut stem: &str,
+    ) -> Self {
+        let mut dir = self.dir.clone();
+        if self.stem != "index" {
+            dir.push(self.stem.clone());
+        }
+        let t_dir = path.split('/').filter(|part| !part.is_empty());
+        for token in t_dir {
+            if token == ".." {
+                if dir.pop().is_none() {
+                    warn!("relative link goes above root: ignoring extra ..");
+                }
+            } else if token != "." {
+                dir.push(token.to_owned());
+            }
+        }
+        if stem.is_empty() {
+            stem = "index";
+        }
+        Self {
+            dir,
+            stem: stem.to_owned(),
+        }
+    }
     pub fn depth(&self) -> usize {
         if self.is_root_index() {
             0
@@ -69,7 +117,7 @@ impl PagePath {
     pub fn is_root_index(&self) -> bool {
         self.dir.is_empty() && self.stem == "index"
     }
-    /// Returns a relative link from this PagePath to another PagePath
+    /// Returns a relative link from this `PagePath` to another `PagePath`
     pub fn link_to(
         &self,
         other: &PagePath,

@@ -9,6 +9,11 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
+/// Run the ddoc command line application
+///
+/// # Errors
+/// Return errors only on unexpected failures, not on invalid
+/// data (those are printed to stderr)
 pub fn run() -> DdResult<()> {
     init_cli_log!();
     let args: Args = Args::parse();
@@ -27,7 +32,7 @@ pub fn run() -> DdResult<()> {
     let project_path = args.path.as_deref().unwrap_or(Path::new("."));
 
     if args.init {
-        return match init_ddoc_project(project_path.to_path_buf()) {
+        return match init_ddoc_project(project_path) {
             Err(DdError::InitNotPossible(reason)) => {
                 eprintln!(
                     "{}\n{}",
@@ -61,17 +66,23 @@ pub fn run() -> DdResult<()> {
     if args.serve {
         // we watch for changes and rebuild automatically on a background thread
         let _watcher = match rebuild_on_change(project_path.clone()) {
-            Ok(w) => Some(w),
+            Ok(w) => {
+                eprintln!(
+                    "Watching for changes in {}",
+                    project_path.to_string_lossy().yellow()
+                );
+                Some(w)
+            }
             Err(e) => {
                 eprintln!(
                     "{} {}",
                     "Warning: could not start file watcher:".yellow().bold(),
                     e,
                 );
+                // we still serve even if the watcher could not be started
                 None
             }
         };
-        eprintln!("Watching for changes in {:?}", &project_path);
         let port = args.port.unwrap_or(8004);
         serve_project(&project, port)?;
     }
