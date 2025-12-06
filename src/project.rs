@@ -183,7 +183,7 @@ impl Project {
         }
         // rewrite relative internal links to .md files
         if let Some((_, path, file, _ext, hash)) =
-            regex_captures!(r"^(\.\./|[\w\-/]+/)*([\w\-/]+)(\.md)?/?(#.*)?$", &src,)
+            regex_captures!(r"^(\.\./|[\w\-/]+/)*([\w\-/]+?)(\.md)?/?(#.*)?$", &src,)
         {
             let dst_page_path = page_path.follow_relative_link(path, file);
             if !self.pages.contains_key(&dst_page_path) {

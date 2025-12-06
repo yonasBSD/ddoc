@@ -7,11 +7,15 @@
 //!
 //! Create a directory, then move to it
 //!
-//!     mkdir website & cd website
+//! ```bash
+//! mkdir website & cd website
+//! ```
 //!
 //! Initialize the site:
 //!
-//!     ddoc --init
+//! ```bash
+//! ddoc --init
+//! ```
 //!
 //! This creates:
 //!
@@ -23,13 +27,17 @@
 //!
 //! To build your site, run
 //!
-//!     ddoc
+//! ```bash
+//! ddoc
+//! ```
 //!
 //! This updates a `site` directory, whose content can be sent to your server.
 //!
 //! If you want to test it locally, you may run
 //!
-//!     ddoc --serve
+//! ```bash
+//! ddoc --serve
+//! ```
 //!
 
 mod cli;
