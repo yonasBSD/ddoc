@@ -158,6 +158,21 @@ impl Project {
         src: &str,
         page_path: &PagePath,
     ) -> Option<String> {
+        // special expansions
+        if src == "--previous" {
+            return self
+                .config
+                .menu
+                .previous(page_path)
+                .map(|dst_page_path| page_path.link_to(dst_page_path));
+        }
+        if src == "--next" {
+            return self
+                .config
+                .menu
+                .next(page_path)
+                .map(|dst_page_path| page_path.link_to(dst_page_path));
+        }
         // rewrite absolute internal links, making them relative to the current page
         if let Some((_, path, file, _ext, hash)) =
             regex_captures!(r"^/([\w\-/]+/)*([\w\-/]*?)(?:index)?(\.md)?/?(#.*)?$", &src,)
@@ -200,6 +215,10 @@ impl Project {
         }
         None
     }
+    /// Return a modified link URL if it needs to be rewritten.
+    ///
+    /// If the src is an expansion and cannot be resolved,
+    /// return the src unchanged.
     pub fn link_url<'s>(
         &self,
         src: &'s str,

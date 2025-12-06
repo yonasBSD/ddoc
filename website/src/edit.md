@@ -36,6 +36,8 @@ the depth of the page including the image. Your reference just has to start with
 
 # Internal links
 
+## Links to pages
+
 In your markdown or in the ddoc.hjson config file, you can refer to other pages, or locations
 in other pages, using either relative or absolute links.
 
@@ -46,3 +48,28 @@ An absolute link is like `/path/to/other_page#some_section`.
 The leading `/` in absolute links refers to the root of your documentation site and the URL
 will be rewritten to be relative to the current page depending on its depth.
 
+## Expansions
+
+Some special values are dynamically expanded:
+
+- `--previous-page` links to the prevous page according to the order defined by the page's list
+- `--next-page` links to the next page
+
+## Javascript call
+
+There's no problem calling a javascript function of one of your scripts from a link.
+
+For example, you can have this in your ddoc.hjson:
+
+```Hjson
+nav_links: {
+    before_menu: [
+    ]
+    after_menu: [
+        {
+            label: ping
+            href: "javascript:alert('test');"
+        }
+    ]
+}
+```

@@ -29,13 +29,24 @@ pages: {
     Home: index.md
 }
 
-// Nav links can have { img, url, class, label}, all optional
-// URL starting with '/' are relative to the site's root
+// Nav links can have { img, href, class, label}, all fields optional.
+// Hrefs starting with '/' are relative to the site's root.
+// You can remove the previous/next links if you don't want them.
 nav_links: {
     before_menu: [
         // this is a good place for a logo or a link to a wider site
     ]
     after_menu: [
+        {
+            img: img/ddoc-left-arrow.svg
+            href: --previous
+            class: previous-page-link
+        }
+        {
+            img: img/ddoc-right-arrow.svg
+            href: --next
+            class: next-page-link
+        }
         <github-navlink>
     ]
 }
@@ -52,7 +63,7 @@ static TEMPLATE_GITHUB_NAVLINK: &str = r#"{
             img: img/github-mark-white.svg
             class: external-nav-link
             alt: GitHub
-            url: <url>
+            href: <url>
         }"#;
 
 /// Initialize a ddoc.hjson file in the specified directory

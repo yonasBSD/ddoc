@@ -17,7 +17,7 @@ nav_links: {
     before_menu: [
         {
             img: img/dystroy-rust-white.svg
-            url: https://dystroy.org
+            href: https://dystroy.org
             alt: dystroy.org homepage
             class: external-nav-link
         }
@@ -30,10 +30,20 @@ nav_links: {
     ]
     after_menu: [
         {
+            img: img/ddoc-left-arrow.svg
+            href: --previous
+            class: previous-page-link
+        }
+        {
+            img: img/ddoc-right-arrow.svg
+            href: --next
+            class: next-page-link
+        }
+        {
             img: img/github-mark-white.svg
             class: external-nav-link
             alt: GitHub
-            url: https://github.com/Canop/ddoc
+            href: https://github.com/Canop/ddoc
         }
     ]
 }

@@ -87,15 +87,25 @@ impl Page {
         project: &Project,
     ) -> DdResult<()> {
         for link in nav_links {
-            html.push_str("<a class=\"nav-link ");
+            let mut unexpanded = false;
+            html.push_str("<a");
+            if let Some(url) = &link.url {
+                let url = project.link_url(url, &self.page_path);
+                if url.starts_with("--") {
+                    // failed expansion (eg --previous on first page)
+                    unexpanded = true;
+                } else {
+                    write!(html, " href=\"{url}\"")?;
+                }
+            }
+            html.push_str(" class=\"nav-link ");
             if let Some(class) = &link.class {
                 html.push_str(class);
             }
-            html.push('\"');
-            if let Some(url) = &link.url {
-                let url = project.link_url(url, &self.page_path);
-                write!(html, " href=\"{url}\"")?;
+            if unexpanded {
+                html.push_str(" unexpanded");
             }
+            html.push('\"');
             html.push('>');
             if let Some(img) = &link.img {
                 let img_url = project.img_url(img, &self.page_path);

@@ -57,6 +57,16 @@ pub fn init_src_in_dir(
     if !img_dir.exists() {
         fs::create_dir_all(&img_dir)?;
     }
+    write_image_if_not_exists(
+        &img_dir,
+        "ddoc-left-arrow.svg",
+        include_bytes!("../../resources/src/img/ddoc-left-arrow.svg"),
+    )?;
+    write_image_if_not_exists(
+        &img_dir,
+        "ddoc-right-arrow.svg",
+        include_bytes!("../../resources/src/img/ddoc-right-arrow.svg"),
+    )?;
     // the following images could be written only if the github navlink is used,
     // but we'd fail people willing to add it later, so we just add them now
     write_image_if_not_exists(

@@ -56,6 +56,57 @@ impl Menu {
             }
         }
     }
+    pub fn add_page_paths<'m>(
+        &'m self,
+        list: &mut Vec<&'m PagePath>,
+    ) {
+        for item in self.items.values() {
+            match item {
+                MenuItem::Page(path) => {
+                    if !list.contains(&path) {
+                        list.push(path);
+                    }
+                }
+                MenuItem::SubMenu(submenu) => {
+                    submenu.add_page_paths(list);
+                }
+            }
+        }
+    }
+    pub fn previous(
+        &self,
+        current_page: &PagePath,
+    ) -> Option<&PagePath> {
+        let mut page_paths = Vec::new();
+        self.add_page_paths(&mut page_paths);
+        for (i, path) in page_paths.iter().enumerate() {
+            if path == &current_page {
+                if i > 0 {
+                    return Some(page_paths[i - 1]);
+                } else {
+                    return None;
+                }
+            }
+        }
+        None
+    }
+    pub fn next(
+        &self,
+        current_page: &PagePath,
+    ) -> Option<&PagePath> {
+        let mut page_paths = Vec::new();
+        self.add_page_paths(&mut page_paths);
+        for (i, path) in page_paths.iter().enumerate() {
+            if path == &current_page {
+                if i + 1 < page_paths.len() {
+                    return Some(page_paths[i + 1]);
+                } else {
+                    return None;
+                }
+            }
+        }
+        None
+    }
     pub fn push_nav(
         &self,
         html: &mut String,

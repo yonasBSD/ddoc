@@ -16,6 +16,7 @@ pub struct MenuLinkConfig {
     pub img: Option<String>,
     pub label: Option<String>,
     pub alt: Option<String>,
+    #[serde(alias = "href")]
     pub url: Option<String>,
     pub class: Option<String>,
 }
