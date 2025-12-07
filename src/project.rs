@@ -37,14 +37,34 @@ impl Project {
             build_path,
         };
         nav.add_pages(&mut project);
+        //dbg!(project.pages.keys().collect::<Vec<&PagePath>>());
         Ok(project)
     }
     pub fn build(&self) -> DdResult<()> {
         self.copy_static("img")?;
         self.copy_static("js")?;
         self.copy_static("css")?;
+        if self.config.needs_search_script() {
+            let search_js_path = self.build_path.join("js").join("ddoc-search.js");
+            if !search_js_path.exists() {
+                if let Some(parent) = search_js_path.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                fs::write(
+                    &search_js_path,
+                    include_bytes!("../resources/site/js/ddoc-search.js"),
+                )?;
+            }
+        }
         for page_path in self.pages.keys() {
             self.build_page(page_path)?;
+        }
+        Ok(())
+    }
+    /// remove the 'build' directory and its content
+    pub fn clean_build_dir(&self) -> DdResult<()> {
+        if self.build_path.exists() {
+            fs::remove_dir_all(&self.build_path)?;
         }
         Ok(())
     }
@@ -97,9 +117,17 @@ impl Project {
     }
     pub fn check_img_path(
         &self,
-        img_path: &str, // a relative path like "img/xyz.png",
+        mut img_path: &str, // a relative path like "img/xyz.png",
         page_path: &PagePath,
     ) {
+        // We tolerate leading ../ in img paths, as long as they don't go
+        // beyond the project src root.
+        // They're useless, but may seem natural to some users.
+        for _ in 0..page_path.depth() {
+            if img_path.starts_with("../") {
+                img_path = &img_path[3..];
+            }
+        }
         let path = self.src_path.join(img_path);
         if !path.exists() {
             eprintln!(
@@ -173,6 +201,9 @@ impl Project {
                 .next(page_path)
                 .map(|dst_page_path| page_path.link_to(dst_page_path));
         }
+        if src == "--search" {
+            return Some("javascript:ddoc_search.open();".to_string());
+        }
         // rewrite absolute internal links, making them relative to the current page
         if let Some((_, path, file, _ext, hash)) =
             regex_captures!(r"^/([\w\-/]+/)*([\w\-/]*?)(?:index)?(\.md)?/?(#.*)?$", &src,)
@@ -185,8 +216,10 @@ impl Project {
             url.push_str(path);
             url.push_str(file);
             url.push_str(hash);
-            let dst_page_path = PagePath::from_path_stem(path, file);
+            let dst_page_path = PagePath::from_path_file(path, file);
             if !self.pages.contains_key(&dst_page_path) {
+                eprintln!("path: {}, file: {}", path, file);
+                eprintln!("dst_page_path: {:?}", dst_page_path);
                 eprintln!(
                     "{}: {} contains a broken link: {}",
                     "error".red(),

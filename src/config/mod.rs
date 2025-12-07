@@ -48,6 +48,9 @@ impl Config {
     pub fn favicon(&self) -> Option<&str> {
         self.favicon.as_deref().filter(|s| !s.is_empty())
     }
+    pub fn needs_search_script(&self) -> bool {
+        self.nav_links.has_href("--search")
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

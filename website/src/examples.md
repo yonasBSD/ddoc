@@ -21,11 +21,22 @@ Source: [https://github.com/Canop/bacon/tree/main/website](https://github.com/Ca
 
 ![broot](img/examples/broot.png)
 
-broot's website is similar to ddoc's too, but shows how a bigger documentation fits ddoc without problem
+broot's website is similar to ddoc's too, but shows how a bigger documentation fits ddoc without problem.
+
+To support tabs wrapping configuration snippets, a small script is injected.
+You can consult it in `/website/src/js`.
 
 website: [https://dystroy.org/broot](https://dystroy.org/broot)
 
 Source: [https://github.com/Canop/broot/tree/main/website](https://github.com/Canop/broot/tree/main/website)
+
+# dysk
+
+![dysk](img/examples/dysk.png)
+
+website: [https://dystroy.org/dysk](https://dystroy.org/dysk)
+
+Source: [https://github.com/Canop/dysk/tree/main/website](https://github.com/Canop/dysk/tree/main/website)
 
 # rhit
 

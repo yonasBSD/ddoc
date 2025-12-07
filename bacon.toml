@@ -95,7 +95,7 @@ command = [
     "cargo", "run",
     "--",
     "--serve",
-    "website"
+    "/home/dys/dev/bacon/website"
 ]
 need_stdout = true
 need_stderr = true

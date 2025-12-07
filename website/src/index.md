@@ -14,44 +14,31 @@
 ## Why NOT use ddoc
 
 * ddoc assumes you want to write or tune, then own, your CSS, not choose among themes
+* ddoc has no templating system - it doesn't suit every need
 * ddoc has less features than any other static site generator
 * ddoc is very new and might need fixes according to feedback
 
-## Project Goals
+## Project Goals, and features
 
 * Be a reliable static site generator for documentation sites
-* Complete and reasonnable navigation (menu, TOC, links)
+* Complete and reasonnable navigation (menu, TOC, links, search)
 * Avoid breaks among versions - no imported CSS
 * Support images, tables, code sections, links, etc.
 * Cross-platform and easy to install - a single binary with no dependencies
 * Clean URL paths, no history shenanigans, obvious links
-* Work without JS (but you can add your own JS if you want to)
-
-## Project Non Goals
-
-* Be as generic as zola, mkdocs, hugo, etc. and try to replace them
-* Templating - **ddoc probably can't do what you need**
-* Theming system - you provide your own CSS
+* Generated HTML is semantic and easy to style with CSS
+* All internal links are relative, ddoc doesn't need to know the base url of the site
 
 ## Possible future goals
 
-* Search - not having one is a significant problem for some big documentations
 * Automated "list" pages - to make ddoc suitable for blogs, albums, etc.
 * Image processing
 * Syntax highlighting in code
-
-## Features
-
-* Generated HTML is semantic and easy to style with CSS
-* All internal links are relative, ddoc doesn't need to know the base url of the site
-* No hidden CSS or JS is injected, only yours
-* No templating - everything is built from your markdown, static files, and the ddoc.hjson config
 
 ## Getting Started
 
 * [Install ddoc](install)
 * [Setup your site](setup)
 * [Edit your site](edit)
-
-
+* [Look at examples](examples)
 

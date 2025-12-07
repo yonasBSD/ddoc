@@ -9,6 +9,16 @@ Each file, to be served, must be referenced in the `pages` section of the `ddoc.
 
 Standard features of CommonMark are available, including links, images, tables, etc.
 
+# Change the style
+
+You don't want to keep the neutral grey look of the default CSS.
+
+The easiest solution is to modify `src/css/site.css` to your taste, either by modifying the variables defined on top, by changing the existing rules or by adding more selective ones.
+
+As long as there's at least one file in `src/css`, `ddoc --init` won't add anything in there, nor replace the `site.css` file, so it's perfectly fine to change it.
+
+Of course you may also start from scratch with a brand new CSS file.
+
 # Add CSS files and JS files
 
 Any file matching `/src/css/*.css` or `/src/js/*.js` will be served.
@@ -54,6 +64,7 @@ Some special values are dynamically expanded:
 
 - `--previous-page` links to the prevous page according to the order defined by the page's list
 - `--next-page` links to the next page
+- `--search` opens the search dialog (and its presence triggers the inclusion of a search script)
 
 ## Javascript call
 

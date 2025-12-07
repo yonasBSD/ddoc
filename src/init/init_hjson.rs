@@ -41,11 +41,19 @@ nav_links: {
             img: img/ddoc-left-arrow.svg
             href: --previous
             class: previous-page-link
+            alt: Previous Page
+        }
+        {
+            img: img/ddoc-search.svg
+            href: --search
+            class: search-opener
+            alt: Search
         }
         {
             img: img/ddoc-right-arrow.svg
             href: --next
             class: next-page-link
+            alt: Next Page
         }
         <github-navlink>
     ]

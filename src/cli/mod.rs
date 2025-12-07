@@ -61,6 +61,10 @@ pub fn run() -> DdResult<()> {
         }
         res => res,
     }?;
+
+    // On launch, we clean the build directory to avoid stale files
+    // (and prevent users from thinking they should edit files there)
+    project.clean_build_dir()?;
     project.build()?;
 
     if args.serve {

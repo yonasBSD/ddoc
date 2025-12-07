@@ -18,17 +18,21 @@ pub struct PagePath {
 }
 
 impl PagePath {
-    pub fn from_path_stem(
+    pub fn from_path_file(
         path: &str,
         stem: &str,
     ) -> Self {
-        let dir = path
+        let mut dir: Vec<String> = path
             .split('/')
             .filter(|part| !part.is_empty())
             .map(|s| s.to_owned())
             .collect();
         let stem = if stem.is_empty() {
-            "index".to_owned()
+            if let Some(s) = dir.pop() {
+                s
+            } else {
+                "index".to_owned()
+            }
         } else {
             stem.to_owned()
         };

@@ -68,6 +68,10 @@ impl Page {
             let url = project.static_url("js", &e.filename, &self.page_path);
             writeln!(html, r#"<script src="{}?m={}"></script>"#, url, e.mtime)?;
         }
+        if project.config.needs_search_script() {
+            let url = project.static_url("js", "ddoc-search.js", &self.page_path);
+            writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
+        }
         for e in project.list_css()? {
             let url = project.static_url("css", &e.filename, &self.page_path);
             writeln!(

@@ -20,3 +20,23 @@ pub struct MenuLinkConfig {
     pub url: Option<String>,
     pub class: Option<String>,
 }
+
+impl NavLinksConfig {
+    pub fn has_href(&self, href: &str) -> bool {
+        for link in &self.before_menu {
+            if let Some(url) = &link.url {
+                if url == href {
+                    return true;
+                }
+            }
+        }
+        for link in &self.after_menu {
+            if let Some(url) = &link.url {
+                if url == href {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
