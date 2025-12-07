@@ -1,15 +1,15 @@
 
 # ddoc
 
-**Warning: ddoc is very (very very) recent and still considered unstable**
-
 ## Introduction
 
 **ddoc** is a markdown based static site generator.
 
 **ddoc** is *much* less powerful than other tools (Hugo, Zola, Mkdocs, etc.) and doesn't include templating or plugins systems.
 
-**ddoc** makes sense when you want a simple site, such as this one, with a site wide navigation menu, a table of content on every page, and you want to be confident the style won't be broken at every release of the tool.
+**ddoc** makes sense when you want a simple site, such as this one, with a site wide navigation menu, a table of content on every page, and you want to be confident the style you defined won't be broken at every release of the tool.
+
+**ddoc** powers the documentations of [broot](https://dystroy.org/broot), [bacon](https://dystroy.org/bacon), [dysk](https://dystroy.org/dysk), [safecloset](https://dystroy.org/safecloset).
 
 ## Why NOT use ddoc
 

@@ -13,7 +13,7 @@ Don't hesitate to come if you have a question.
 
 # Issues
 
-We use [GitHub's issue manager](https://github.com/Canop/ddoc/issues).
+We use the [GitHub's issue manager](https://github.com/Canop/ddoc/issues).
 
 Before posting a new issue, check your problem hasn't already been raised and in case of doubt **please come first discuss it on the chat**.
 

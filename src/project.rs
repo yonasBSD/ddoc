@@ -37,7 +37,6 @@ impl Project {
             build_path,
         };
         nav.add_pages(&mut project);
-        //dbg!(project.pages.keys().collect::<Vec<&PagePath>>());
         Ok(project)
     }
     pub fn build(&self) -> DdResult<()> {

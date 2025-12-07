@@ -52,11 +52,25 @@ pub fn run() -> DdResult<()> {
 
     let project = match Project::load(&project_path) {
         Err(DdError::ConfigNotFound) => {
-            eprintln!(
-                "{}\nYou can initialize ddoc with {}",
-                "No ddoc.hjson found".red().bold(),
-                "ddoc --init".green().bold(),
-            );
+            // A frequent error is to run ddoc in a super director
+            // of a ddoc project, so we check for that
+            if let Some(subdir) = project_subdirectory(&project_path) {
+                let name = subdir
+                    .file_name()
+                    .map_or("that dir".to_string(), |s| s.to_string_lossy().to_string());
+                eprintln!(
+                    "{}\nBut {} looks like a ddoc project\nSo maybe do {} then run ddoc there?",
+                    "No ddoc.hjson found in current directory".red().bold(),
+                    subdir.to_string_lossy().yellow(),
+                    format!("cd {}", name).green(),
+                );
+            } else {
+                eprintln!(
+                    "{}\nYou can initialize ddoc with {}",
+                    "No ddoc.hjson found".red().bold(),
+                    "ddoc --init".green().bold(),
+                );
+            }
             return Ok(());
         }
         res => res,
