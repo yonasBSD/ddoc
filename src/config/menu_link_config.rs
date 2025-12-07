@@ -22,7 +22,10 @@ pub struct MenuLinkConfig {
 }
 
 impl NavLinksConfig {
-    pub fn has_href(&self, href: &str) -> bool {
+    pub fn has_href(
+        &self,
+        href: &str,
+    ) -> bool {
         for link in &self.before_menu {
             if let Some(url) = &link.url {
                 if url == href {

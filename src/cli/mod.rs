@@ -66,6 +66,10 @@ pub fn run() -> DdResult<()> {
     // (and prevent users from thinking they should edit files there)
     project.clean_build_dir()?;
     project.build()?;
+    eprintln!(
+        "site built in {}",
+        project.build_path.to_string_lossy().yellow()
+    );
 
     if args.serve {
         // we watch for changes and rebuild automatically on a background thread
