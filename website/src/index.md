@@ -5,9 +5,11 @@
 
 **ddoc** is a markdown based static site generator.
 
-**ddoc** is *much* less powerful than other tools (Hugo, Zola, Mkdocs, etc.) and doesn't include templating or plugins systems.
+**ddoc** is less powerful than other tools (Hugo, Zola, Mkdocs, etc.) and doesn't include templating or plugins systems.
 
 **ddoc** makes sense when you want a simple site, such as this one, with a site wide navigation menu, a table of content on every page, and you want to be confident the style you defined won't be broken at every release of the tool.
+
+**ddoc** aims to have the simplest and fastest installation and configuration process, so that you just have to add markdown files and edit your CSS in a standard and obvious way.
 
 **ddoc** powers the documentations of [broot](https://dystroy.org/broot), [bacon](https://dystroy.org/bacon), [dysk](https://dystroy.org/dysk), [safecloset](https://dystroy.org/safecloset).
 
@@ -15,7 +17,7 @@
 
 * ddoc assumes you want to write or tune, then own, your CSS, not choose among themes
 * ddoc has no templating system - it doesn't suit every need
-* ddoc has less features than any other static site generator
+* ddoc has less features than other static site generators
 * ddoc is very new and might need fixes according to feedback
 
 ## Project Goals, and features
@@ -31,9 +33,11 @@
 
 ## Possible future goals
 
-* Automated "list" pages - to make ddoc suitable for blogs, albums, etc.
+* Automated lists and page types, to make ddoc suitable for blogs, albums, etc.
 * Image processing
 * Syntax highlighting in code
+
+Those goals are pre-designed for retro-compatibility, to ensure ddoc sites aren't broken by new versions.
 
 ## Getting Started
 

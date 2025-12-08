@@ -35,6 +35,10 @@ body {
 	line-height: 1.5;
 }
 
+.hidden {
+	display: none;
+}
+
 nav ul {
 	list-style-type: none;
 }
@@ -468,6 +472,18 @@ main a:hover {
 	background: var(--accent);
 }
 
+/* footer */
+footer {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-end;
+	padding: 10px;
+	height: 20px;
+}
+footer nav a.nav-link {
+	color: var(--text);
+}
 
 /* search */
 .ddoc-search-panel-wrapper {

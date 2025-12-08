@@ -1,9 +1,13 @@
 mod menu_config;
-mod menu_link_config;
+mod menu_insert;
+mod nav_component;
+mod nav_link;
 
 pub use {
     menu_config::*,
-    menu_link_config::*,
+    menu_insert::*,
+    nav_component::*,
+    nav_link::*,
 };
 
 use {
@@ -24,7 +28,9 @@ pub struct Config {
     pub menu: Menu,
     pub favicon: Option<String>,
     #[serde(default)]
-    pub nav_links: NavLinksConfig,
+    pub header: NavDir,
+    #[serde(default)]
+    pub footer: NavDir,
     #[serde(default)]
     pub ui: UiOptions,
 }
@@ -49,7 +55,7 @@ impl Config {
         self.favicon.as_deref().filter(|s| !s.is_empty())
     }
     pub fn needs_search_script(&self) -> bool {
-        self.nav_links.has_href("--search")
+        self.header.has_href("--search")
     }
 }
 

@@ -3,7 +3,7 @@
 
 # Discuss ddoc in a chat room
 
-The best place to chat about ddoc, to talk about features or bugs, to get help, is the Miaou chat:
+The best place to chat about ddoc, to talk about features or bugs, or to get help, is the Miaou chat:
 
 <a href="https://miaou.dystroy.org/4863?ddoc"><img class=inline src="https://miaou.dystroy.org/static/shields/room-en.svg?v=1" alt="Chat on Miaou" /></a> **ddoc** room
 

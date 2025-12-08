@@ -87,13 +87,13 @@ impl Page {
     fn write_nav_links(
         &self,
         html: &mut String,
-        nav_links: &[MenuLinkConfig],
+        nav_links: &[NavLink],
         project: &Project,
     ) -> DdResult<()> {
         for link in nav_links {
             let mut unexpanded = false;
             html.push_str("<a");
-            if let Some(url) = &link.url {
+            if let Some(url) = &link.href {
                 let url = project.link_url(url, &self.page_path);
                 if url.starts_with("--") {
                     // failed expansion (eg --previous on first page)
@@ -129,24 +129,33 @@ impl Page {
         }
         Ok(())
     }
-
-    /// Write the HTML `<header>` containing the site navigation menu
-    pub fn write_html_header(
+    /// Write the HTML content for a navigation directory (header or footer)
+    pub fn write_nav_dir(
         &self,
         html: &mut String,
+        tag: &str,
+        nav_dir: &NavDir,
         project: &Project,
     ) -> DdResult<()> {
-        html.push_str("<header>\n");
-        html.push_str("<nav class=before-menu>\n");
-        self.write_nav_links(html, &project.config.nav_links.before_menu, project)?;
-        html.push_str("</nav>\n");
-        project.config.menu.push_nav(html, project, &self.page_path);
-        html.push_str("<nav class=after-menu>\n");
-        self.write_nav_links(html, &project.config.nav_links.after_menu, project)?;
-        html.push_str("</nav>\n");
-        html.push_str("</header>\n");
+        if !nav_dir.is_empty() {
+            writeln!(html, "<{tag}>")?;
+            for (class_name, component) in &nav_dir.components {
+                match component {
+                    NavComponent::NavLinks(links) => {
+                        writeln!(html, "<nav class=\"{class_name}\">")?;
+                        self.write_nav_links(html, links, project)?;
+                        html.push_str("</nav>\n");
+                    }
+                    NavComponent::Menu(_) => {
+                        project.config.menu.push_nav(html, project, class_name, &self.page_path)?;
+                    }
+                }
+            }
+            writeln!(html, "</{tag}>")?;
+        }
         Ok(())
     }
+
     /// Write the part of the HTML generated from the page's Markdown content
     ///
     /// The resulting html contains,
@@ -265,8 +274,9 @@ impl Page {
         };
         self.write_html_head(html, project)?;
         writeln!(html, "<body class=\"page-{}\">\n", &self.page_path.stem)?;
-        self.write_html_header(html, project)?; // header with logos & site-nav
+        self.write_nav_dir(html, "header", &project.config.header, project)?;
         self.write_html_article(html, &md, project)?; // page-to & article
+        self.write_nav_dir(html, "footer", &project.config.footer, project)?;
         html.push_str("</html>\n");
         Ok(())
     }

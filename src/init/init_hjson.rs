@@ -29,14 +29,15 @@ pages: {
     Home: index.md
 }
 
-// Nav links can have { img, href, class, label}, all fields optional.
+// Header and footer links can have { img, href, class, label, alt}, all fields optional.
 // Hrefs starting with '/' are relative to the site's root.
-// You can remove the previous/next links if you don't want them.
-nav_links: {
-    before_menu: [
+// You can remove any part if you don't want it.
+header: {
+    before-menu: [ // "before-menu" is the className which will be applied
         // this is a good place for a logo or a link to a wider site
     ]
-    after_menu: [
+    middle: menu
+    after-menu: [
         {
             img: img/ddoc-left-arrow.svg
             href: --previous
@@ -57,6 +58,8 @@ nav_links: {
         }
         <github-navlink>
     ]
+}
+footer: {
 }
 
 // UI options

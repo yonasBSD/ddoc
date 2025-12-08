@@ -111,9 +111,10 @@ impl Menu {
         &self,
         html: &mut String,
         project: &Project,
+        nav_class_name: &ClassName,
         hosting_page_path: &PagePath,
-    ) {
-        html.push_str("<nav class=site-nav>\n");
+    ) -> DdResult<()> {
+        writeln!(html, "<nav class=\"site-nav {nav_class_name}\">")?;
         if project.config.ui.hamburger_checkbox {
             html.push_str(
                 "<input type=checkbox id=nav-toggle class=nav-toggle>\n\
@@ -122,6 +123,7 @@ impl Menu {
         }
         self.push_nav_item_html(html, project, hosting_page_path);
         html.push_str("</nav>\n");
+        Ok(())
     }
     /// Generate the HTML for a menu or submenu hosted on a page.
     #[allow(clippy::only_used_in_recursion)]
@@ -131,7 +133,7 @@ impl Menu {
         project: &Project,
         hosting_page_path: &PagePath,
     ) {
-        html.push_str("<ul class=nav-menu>\n");
+        html.push_str("<ul class=\"nav-menu\">\n");
         for (title, item) in &self.items {
             let (link, selected) = match item {
                 MenuItem::Page(path) => {

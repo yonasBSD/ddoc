@@ -11,7 +11,7 @@ Initialize the site:
 
 This creates:
 
-- a `.gitignore` file, which eases inclusion of your site in a git managed project
+- a `.gitignore` file, so that you don't commit the generated `site` directory
 - a `ddoc.hjson` file, holding the basic properties and navigation
 - a `src` folder, for your markdown files, CSS style sheets, scripts, and images
 
@@ -31,7 +31,7 @@ If you want to test it locally, you may run
 
     ddoc --serve
 
-**ddoc** rebuilds the site on changes but the page isn't automatically reloaded (the site is served without injected script, exactly as you'll use it in production), so you'll have to refresh the page in the browser to see the change.
+**ddoc** rebuilds the site on changes but the page isn't automatically reloaded (the site is served without additional script, exactly as you'll use it in production), so you'll have to refresh the page in the browser to see the change.
 
 Now that you've see the initial, quite void, site, you should [edit it](../edit).
 
@@ -47,7 +47,7 @@ If you don't have a `src/index.md` file, one will be written.
 
 If you don't have a `src/css` directory, the default `src/css/site.css` file will be written.
 
-If nothing is obviously missing, ddoc won't do anything.
+If nothing is obviously missing, ddoc won't do anything. Most importantly, `ddoc --init` won't overwrite or remove any file.
 
 So to restore defaults, remove some part and run `ddoc --init`.
 

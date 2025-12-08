@@ -16,8 +16,8 @@ pages: {
     }
 }
 
-nav_links: {
-    before_menu: [
+header: {
+    before-menu: [
         {
             img: img/dystroy-rust-white.svg
             href: https://dystroy.org
@@ -31,8 +31,9 @@ nav_links: {
             class: home-link
         }
     ]
-    after_menu: [
-        {
+    middle: menu
+    after-menu: [
+        {   
             img: img/ddoc-left-arrow.svg
             href: --previous
             class: previous-page-link
@@ -55,6 +56,16 @@ nav_links: {
             class: external-nav-link
             alt: GitHub
             href: https://github.com/Canop/ddoc
+        }
+    ]
+}
+footer: {
+    // this is an example, we don't really want to show it, hence
+    // the 'hidden' class
+    hidden: [
+        {
+            label: made with ddoc
+            href: https://dystroy.org/ddoc
         }
     ]
 }
