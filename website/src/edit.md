@@ -73,10 +73,9 @@ There's no problem calling a javascript function of one of your scripts from a l
 For example, you can have this in your ddoc.hjson:
 
 ```Hjson
-nav_links: {
-    before_menu: [
-    ]
-    after_menu: [
+header: {
+    left: menu
+    right: [
         {
             label: ping
             href: "javascript:alert('test');"
