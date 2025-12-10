@@ -17,7 +17,7 @@ The development of ddoc was motivated by the frequent breakages occuring with ot
 
 You should be able to generate your site from whatever system, whatever version of the tool, and get the same style.
 
-You should also not have to deal with huge imported theming CSS files full of `important!` and crumbling under their complexity.
+You should also not have to deal with huge imported theming CSS files full of `!important` and crumbling under their complexity.
 
 Summarizing the goals and features of **ddoc**:
 
