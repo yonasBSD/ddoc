@@ -422,7 +422,6 @@ dependencies = [
  "lazy-regex",
  "notify",
  "pulldown-cmark",
- "pulldown-cmark-toc",
  "rouille",
  "rustc-hash",
  "serde",
@@ -1141,16 +1140,6 @@ name = "pulldown-cmark-escape"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "007d8adb5ddab6f8e3f491ac63566a7d5002cc7ed73901f72057943fa71ae1ae"
-
-[[package]]
-name = "pulldown-cmark-toc"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0487b2248f85d95471b858f0c8fe25abe71d0a877da953b3c61d4e7bb7642ab"
-dependencies = [
- "pulldown-cmark",
- "regex",
-]
 
 [[package]]
 name = "quick-error"

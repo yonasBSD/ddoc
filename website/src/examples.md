@@ -23,7 +23,7 @@ Source: [https://github.com/Canop/bacon/tree/main/website](https://github.com/Ca
 
 broot's website is similar to ddoc's too, but shows how a bigger documentation fits ddoc without problem.
 
-To support tabs wrapping configuration snippets, [a small script](https://github.com/Canop/broot/blob/main/website/src/js/tab-langs.js) is injected with matching [stylesheet](https://github.com/Canop/broot/blob/main/website/src/css/tab-langs.css).
+broot uses additional scripts (in [/src/js](https://github.com/Canop/broot/blob/main/website/src/js/)) and stylesheets (in [/src/css](https://github.com/Canop/broot/blob/main/website/src/css/)) to highlight code and to group block codes and wrap them with tabs.
 
 website: [https://dystroy.org/broot](https://dystroy.org/broot)
 

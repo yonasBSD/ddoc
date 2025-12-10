@@ -41,7 +41,6 @@ Summarizing the goals and features of **ddoc**:
 
 * Automated lists and page types, to make ddoc suitable for blogs, albums, etc.
 * Image processing
-* Syntax highlighting in code
 
 Those goals are pre-designed for retro-compatibility, to ensure ddoc sites aren't broken by new versions.
 

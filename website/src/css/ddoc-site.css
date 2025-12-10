@@ -18,7 +18,7 @@ body.page-examples main img {
 }
 @media (min-width: 768px) { /* wide screens */
     body.page-examples main img {
-        max-width: 400px;
+        max-width: 500px;
     }
 }
 footer .made-with-ddoc {
