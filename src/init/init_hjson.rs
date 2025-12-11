@@ -29,8 +29,9 @@ pages: {
     Home: index.md
 }
 
-// Header and footer links can have { img, href, class, label, alt}, all fields optional.
-// Hrefs starting with '/' are relative to the site's root.
+// Header and footer links can have { img, href, class, label, alt, target}.
+// All these fields are optional.
+// Hrefs starting with '/' are relative to the site's root (eg '/guide/help.md')
 // You can remove any part if you don't want it.
 header: {
     before-menu: [ // "before-menu" is the className which will be applied

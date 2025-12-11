@@ -110,6 +110,9 @@ impl Page {
                 html.push_str(" unexpanded");
             }
             html.push('\"');
+            if let Some(target) = &link.target {
+                write!(html, " target=\"{target}\"")?;
+            }
             html.push('>');
             if let Some(img) = &link.img {
                 let img_url = project.img_url(img, &self.page_path);

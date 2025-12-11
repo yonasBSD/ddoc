@@ -12,4 +12,5 @@ pub struct NavLink {
     #[serde(alias = "url")]
     pub href: Option<String>,
     pub class: Option<String>,
+    pub target: Option<String>,
 }
