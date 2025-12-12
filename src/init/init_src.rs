@@ -46,6 +46,8 @@ pub fn init_src_in_dir(
     let css_dir = src_dir.join("css");
     if !css_dir.exists() {
         fs::create_dir_all(&css_dir)?;
+    }
+    if !has_css(&css_dir)? {
         fs::write(
             css_dir.join("site.css"),
             include_bytes!("../../resources/src/css/site.css"),
@@ -86,6 +88,17 @@ pub fn init_src_in_dir(
     )?;
 
     Ok(())
+}
+
+fn has_css(css_dir: &Path) -> DdResult<bool> {
+    for entry in fs::read_dir(css_dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("css") {
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }
 
 fn write_image_if_not_exists(

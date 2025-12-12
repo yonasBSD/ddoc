@@ -45,7 +45,7 @@ If you don't have a `ddoc.hjson` file, it will be created.
 
 If you don't have a `src/index.md` file, one will be written.
 
-If you don't have a `src/css` directory, the default `src/css/site.css` file will be written.
+If you don't have any CSS file in `src/css`, the default `src/css/site.css` file will be written.
 
 If nothing is obviously missing, ddoc won't do anything. Most importantly, `ddoc --init` won't overwrite or remove any file.
 

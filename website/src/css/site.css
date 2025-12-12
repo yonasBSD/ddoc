@@ -17,6 +17,7 @@
 	--search-results-bg: linear-gradient(#ddd,#ccc);
 	--search-result-link-fg: #000c;
 	--hovered-search-result-link-fg: #000;
+	--search-match-bg: var(--accent);
 }
 
 html, body, div, nav, header {

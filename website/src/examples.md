@@ -37,12 +37,3 @@ website: [https://dystroy.org/dysk](https://dystroy.org/dysk)
 
 Source: [https://github.com/Canop/dysk/tree/main/website](https://github.com/Canop/dysk/tree/main/website)
 
-# rhit
-
-![rhit](img/examples/rhit.png)
-
-This site sports a different layout, with vertical navigation stripes.
-
-website: [https://dystroy.org/rhit](https://dystroy.org/rhit)
-
-Source: [https://github.com/Canop/rhit/tree/main/website](https://github.com/Canop/rhit/tree/main/website)
