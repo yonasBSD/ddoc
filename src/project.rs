@@ -14,6 +14,8 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
+/// A ddoc project, with its configuration, pages, and
+/// location which allows building it.
 pub struct Project {
     pub root: PathBuf,
     pub config: Config,
@@ -133,7 +135,7 @@ impl Project {
         base_url: &str, // for informing the user on the link to look at
     ) -> DdResult<()> {
         info!("full rebuild");
-        eprintln!("full rebuild of {}", base_url.yellow());
+        eprintln!("Full rebuild of {}", base_url.yellow());
         self.config = {
             let Ok(new_config) = read_file::<Config, _>(&self.config_path) else {
                 eprintln!(
@@ -383,6 +385,7 @@ impl Project {
     }
 }
 
+/// Copy normal non hidden files from src_dir to dst_dir recursively
 fn copy_normal_recursive(
     src_dir: &Path,
     dst_dir: &Path,

@@ -81,7 +81,7 @@ pub fn run() -> DdResult<()> {
     project.clean_build_dir()?;
     project.build()?;
     eprintln!(
-        "site built in {}",
+        "Site built in {}",
         project.build_path.to_string_lossy().yellow()
     );
 
