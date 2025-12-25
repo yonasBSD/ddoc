@@ -1,5 +1,6 @@
 use {
     crate::*,
+    crossbeam::channel,
     notify::{
         EventKind,
         RecommendedWatcher,
@@ -13,15 +14,28 @@ use {
             RenameMode,
         },
     },
+    std::{
+        path::PathBuf,
+        sync::{
+            Arc,
+            atomic::{
+                AtomicBool,
+                Ordering,
+            },
+        },
+        thread,
+    },
     termimad::crossterm::style::Stylize,
 };
+
+const DEBOUNCE_DELAY_MS: u64 = 100;
 
 #[derive(Debug)]
 pub enum FileChange {
     /// Creation, move inside, edition, etc.
-    Write(std::path::PathBuf),
+    Write(PathBuf),
     /// Removal, move outside, etc. but also first part of a move inside
-    Removal(std::path::PathBuf),
+    Removal(PathBuf),
     /// Anything else looking relevant (e.g. multiple files written)
     /// A full rebuild is probably needed
     Other,
@@ -35,8 +49,12 @@ pub fn rebuild_on_change(
     mut project: Project,
     base_url: String, // to display the modified page URL
 ) -> Result<RecommendedWatcher, notify::Error> {
+    let skip = Arc::new(AtomicBool::new(false));
+    let snd_skip = skip.clone();
     let config_path = project.config_path.clone();
     let src_path = project.src_path.clone();
+    //let (snd, rcv) = mpsc::sync_channel::<FileChange>(100);
+    let (snd, rcv) = channel::unbounded::<FileChange>();
     let mut watcher =
         notify::recommended_watcher(move |res: notify::Result<notify::Event>| match res {
             Ok(we) => {
@@ -50,6 +68,9 @@ pub fn rebuild_on_change(
                 match we.kind {
                     EventKind::Modify(ModifyKind::Metadata(_)) => {
                         return; // useless event
+                    }
+                    EventKind::Modify(ModifyKind::Data(DataChange::Content)) => {
+                        debug!("modify content event: {we:?}");
                     }
                     EventKind::Modify(ModifyKind::Data(DataChange::Any)) => {
                         return; // probably useless event with no real change
@@ -74,6 +95,11 @@ pub fn rebuild_on_change(
                         return;
                     }
                 }
+                if snd_skip.load(Ordering::SeqCst) {
+                    debug!("skipping event due to skip flag: {we:?}");
+                    return;
+                }
+                snd_skip.store(true, Ordering::SeqCst);
                 let path = if we.paths.len() == 1 {
                     Some(we.paths[0].clone())
                 } else {
@@ -84,18 +110,35 @@ pub fn rebuild_on_change(
                     (Some(p), false) => FileChange::Write(p),
                     (None, _) => FileChange::Other,
                 };
-                info!("rebuilding site due to {change:?}");
-                let start = std::time::Instant::now();
-                match project.update(change, &base_url) {
-                    Ok(true) => eprintln!("Site rebuilt in {}", duration_since(start)),
-                    Ok(false) => debug!("No rebuild needed"),
-                    Err(e) => eprintln!("{}{}", "Error rebuilding site: ".red().bold(), e),
-                }
+                let _ = snd.send(change);
             }
             Err(e) => warn!("watch error: {e:?}"),
         })?;
     watcher.watch(&config_path, RecursiveMode::NonRecursive)?;
     watcher.watch(&src_path, RecursiveMode::Recursive)?;
+    // start the build thread
+    thread::spawn(move || {
+        let debounce_delay = std::time::Duration::from_millis(DEBOUNCE_DELAY_MS);
+        loop {
+            match rcv.recv() {
+                Ok(change) => {
+                    thread::sleep(debounce_delay);
+                    info!("rebuilding site due to {change:?}");
+                    let start = std::time::Instant::now();
+                    match project.update(change, &base_url) {
+                        Ok(true) => eprintln!("Site rebuilt in {}", duration_since(start)),
+                        Ok(false) => debug!("No rebuild needed"),
+                        Err(e) => eprintln!("{}{}", "Error rebuilding site: ".red().bold(), e),
+                    }
+                    skip.store(false, Ordering::SeqCst);
+                }
+                Err(e) => {
+                    warn!("rebuild_on_change channel error: {e:?}");
+                    break;
+                }
+            }
+        }
+    });
     Ok(watcher)
 }
 

@@ -417,6 +417,7 @@ dependencies = [
  "clap",
  "clap-help",
  "cli-log",
+ "crossbeam",
  "deser-hjson",
  "indexmap",
  "lazy-regex",

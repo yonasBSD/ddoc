@@ -318,9 +318,12 @@ function open_search_panel() {
         } else if (event.key === 'Enter') {
             // enter
             if (selection_index >= 0 && selection_index < items.length) {
-                let link = items[selection_index].querySelector('a');
-                if (link) {
-                    window.location.href = link.href;
+                let links = items[selection_index].querySelectorAll('a');
+                if (links.length > 0) {
+                    // when building results, we may set up more than one link
+                    // (eg: page and section), we take the last one which
+                    // is the most precise
+                    window.location.href = links[links.length-1].href;
                 }
             }
         }
