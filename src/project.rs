@@ -110,7 +110,7 @@ impl Project {
                         return Ok(false); // might be a readme, etc.
                     }
                     if let Ok(rel_img) = rel_path.strip_prefix("img/") {
-                        info!("Deployed image {:?}", rel_img);
+                        info!("Deployed image {rel_img:?}");
                         eprintln!("Deployed image {}", rel_img.to_string_lossy().yellow());
                         let dst_path = self.build_path.join("img").join(rel_img);
                         if let Some(parent) = dst_path.parent() {
@@ -385,7 +385,7 @@ impl Project {
     }
 }
 
-/// Copy normal non hidden files from src_dir to dst_dir recursively
+/// Copy normal non hidden files from `src_dir` to `dst_dir` recursively
 fn copy_normal_recursive(
     src_dir: &Path,
     dst_dir: &Path,

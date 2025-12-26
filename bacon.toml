@@ -50,6 +50,9 @@ command = [
     "-A", "clippy::map_unwrap_or",
     "-A", "clippy::uninlined_format_args",
     "-A", "clippy::match_same_arms",
+    "-A", "clippy::redundant-else",
+    "-A", "clippy::unnecessary_debug_formatting",
+    "-A", "clippy::return-self-not-must-use",
 ]
 need_stdout = false
 

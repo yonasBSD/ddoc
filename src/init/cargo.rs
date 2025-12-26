@@ -49,6 +49,6 @@ impl CargoToml {
             .repository
             .as_deref()
             .filter(|repo| regex_is_match!(r"^https://github\.com/.+$", repo))
-            .map(|s| s.to_owned())
+            .map(std::borrow::ToOwned::to_owned)
     }
 }
