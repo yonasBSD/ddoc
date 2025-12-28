@@ -1,14 +1,10 @@
 use {
     crate::*,
-    indexmap::IndexMap,
-    serde::{
-        Deserialize,
-        de,
-    },
+    serde::de,
     std::fmt,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct CompositeElement {
     pub entries: Vec<CompositeElementEntry>,
 }
@@ -18,25 +14,7 @@ pub struct CompositeElementEntry {
     pub value: Element,
 }
 
-#[derive(Debug, Clone, Deserialize)]
-#[serde(untagged)]
-pub enum DeserElement {
-    Composite(CompositeElement),
-    Attributes(IndexMap<AttributeKey, AttributeValue>),
-}
-
 impl CompositeElement {
-    pub fn get_by_key(
-        &self,
-        key: &str,
-    ) -> Option<&Element> {
-        for entry in &self.entries {
-            if entry.key == key {
-                return Some(&entry.value);
-            }
-        }
-        None
-    }
     pub fn get(
         &self,
         index: usize,
@@ -45,6 +23,19 @@ impl CompositeElement {
     }
     pub fn len(&self) -> usize {
         self.entries.len()
+    }
+    pub fn visit<F>(
+        &self,
+        mut f: F,
+    ) where
+        F: FnMut(&ElementKey, &Element),
+    {
+        for entry in &self.entries {
+            f(&entry.key, &entry.value);
+            if let Element::Composite(comp) = &entry.value {
+                comp.visit(&mut f);
+            }
+        }
     }
 }
 
@@ -87,42 +78,42 @@ fn test_element_deserialization() {
     {
         header: {
             div.before-menu: {
-                link: {
+                ddoc-link: {
                     img: img/dystroy-rust-white.svg
                     href: https://dystroy.org
                     alt: dystroy.org homepage
                     class: external-nav-link
                 }
-                link: {
+                ddoc-link: {
                     url: /index.md
                     alt: ddoc homepage
                     label: ddoc
                     class: home-link
                 }
             }
-            menu: {
+            ddoc-menu: {
                 hamburger-checkbox: true
             }
             div.after-menu: {
-                link: {
+                ddoc-link: {
                     img: img/ddoc-left-arrow.svg
                     href: --previous
                     class: previous-page-link
                     alt: Previous Page
                 }
-                link: {
+                ddoc-link: {
                     img: img/ddoc-search.svg
                     href: --search
                     class: search-opener
                     alt: Search
                 }
-                link: {
+                ddoc-link: {
                     img: img/ddoc-right-arrow.svg
                     href: --next
                     class: next-page-link
                     alt: Next Page
                 }
-                link: {
+                ddoc-link: {
                     img: img/github-mark-white.svg
                     class: external-nav-link
                     alt: GitHub
@@ -130,6 +121,25 @@ fn test_element_deserialization() {
                 }
             }
         }
+        article: {
+            aside.page-nav: {
+                ddoc-toc: {}
+            }
+            ddoc-main: {}
+        }
+        footer: {
+            div.made-with-ddoc: {
+                ddoc-link: {
+                    label: made with
+                }
+                ddoc-link: {
+                    label: ddoc
+                    href: https://dystroy.org/ddoc
+                    class: link-to-ddoc
+                }
+            }
+        }
+
     }
     "#;
     let element: Element = deser_hjson::from_str(hjson).unwrap();
@@ -142,11 +152,38 @@ fn test_element_deserialization() {
         .as_composite()
         .unwrap();
     assert_eq!(header.len(), 3);
-    //assert_eq!(
-    //    element.as_content().unwrap()
-    //    .get("div.after-menu").unwrap()
-    //    .as_content().unwrap()
-    //    .get("link").unwrap()
-    //    .as_attributes().unwrap()
-    //    .get("href
+    let after_menu = header.get(2).unwrap();
+    assert_eq!(after_menu.key.to_string(), "div.after-menu");
+    assert_eq!(after_menu.key.classes[0], "after-menu");
+    let after_menu = after_menu.value.as_composite().unwrap();
+    assert_eq!(after_menu.len(), 4);
+    assert_eq!(after_menu.get(2).unwrap().key.etype, ElementType::Link);
+    assert_eq!(
+        after_menu
+            .get(2)
+            .unwrap()
+            .value
+            .as_attributes()
+            .unwrap()
+            .get("href")
+            .unwrap()
+            .as_str()
+            .unwrap(),
+        "--next"
+    );
+    let toc = element
+        .as_composite()
+        .unwrap()
+        .get(1)
+        .unwrap()
+        .value
+        .as_composite()
+        .unwrap()
+        .get(0)
+        .unwrap()
+        .value
+        .as_composite()
+        .unwrap()
+        .get(0)
+        .unwrap();
 }

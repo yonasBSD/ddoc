@@ -3,20 +3,10 @@ use {
     indexmap::IndexMap,
     serde::{
         Deserialize,
-        de,
     },
-    std::fmt,
 };
 
-pub type ElementKey = String;
-
 pub type AttributeKey = String;
-
-pub enum ElementType {
-    HtmlTag(String),
-    Menu,
-    Link,
-}
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(untagged)]

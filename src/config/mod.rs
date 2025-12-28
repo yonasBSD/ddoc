@@ -1,6 +1,7 @@
 mod composite_element;
 mod element;
-mod menu_config;
+mod element_key;
+mod menu;
 mod menu_insert;
 mod nav_component;
 mod nav_link;
@@ -8,7 +9,8 @@ mod nav_link;
 pub use {
     composite_element::*,
     element::*,
-    menu_config::*,
+    element_key::*,
+    menu::*,
     menu_insert::*,
     nav_component::*,
     nav_link::*,
@@ -28,7 +30,7 @@ use {
 
 pub static CONFIG_FILE_NAME: &str = "ddoc.hjson";
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Config {
     pub title: String,
     pub description: Option<String>,
@@ -37,11 +39,13 @@ pub struct Config {
     pub menu: Menu,
     pub favicon: Option<String>,
     #[serde(default)]
-    pub header: NavDir,
+    pub header: NavDir, // deprecate - move as transparent in an OldBodyElement struct
     #[serde(default)]
-    pub footer: NavDir,
+    pub footer: NavDir, // deprecate - move as transparent in an OldBodyElement struct
     #[serde(default)]
-    pub ui: UiOptions,
+    pub ui: UiOptions, // deprecate - move as transparent in an OldBodyElement struct
+    #[serde(default)]
+    pub body: CompositeElement,
 }
 
 impl Config {
