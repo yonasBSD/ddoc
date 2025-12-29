@@ -10,25 +10,25 @@ use {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(untagged)]
-pub enum MenuItem {
+pub enum ListItem {
     Page(PagePath),
-    SubMenu(Menu),
+    List(PageList),
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(transparent)]
-pub struct Menu {
-    pub items: IndexMap<String, MenuItem>,
+pub struct PageList {
+    pub items: IndexMap<String, ListItem>,
 }
 
-impl Menu {
+impl PageList {
     pub fn first_page_path(&self) -> Option<PagePath> {
         for item in self.items.values() {
             match item {
-                MenuItem::Page(path) => {
+                ListItem::Page(path) => {
                     return Some(path.clone());
                 }
-                MenuItem::SubMenu(submenu) => {
+                ListItem::List(submenu) => {
                     if let Some(path) = submenu.first_page_path() {
                         return Some(path);
                     }
@@ -43,14 +43,14 @@ impl Menu {
     ) {
         for (title, item) in &self.items {
             match item {
-                MenuItem::Page(path) => {
+                ListItem::Page(path) => {
                     if !project.pages.contains_key(path) {
                         let md_file_path = path.md_path_buf(&project.src_path);
                         let page = Page::new(title.clone(), path.clone(), md_file_path);
                         project.pages.insert(path.clone(), page);
                     }
                 }
-                MenuItem::SubMenu(submenu) => {
+                ListItem::List(submenu) => {
                     submenu.add_pages(project);
                 }
             }
@@ -62,12 +62,12 @@ impl Menu {
     ) {
         for item in self.items.values() {
             match item {
-                MenuItem::Page(path) => {
+                ListItem::Page(path) => {
                     if !list.contains(&path) {
                         list.push(path);
                     }
                 }
-                MenuItem::SubMenu(submenu) => {
+                ListItem::List(submenu) => {
                     submenu.add_page_paths(list);
                 }
             }
@@ -110,18 +110,22 @@ impl Menu {
     pub fn push_nav(
         &self,
         html: &mut String,
-        project: &Project,
-        nav_class_name: &ClassName,
+        classes: &[ClassName],
+        menu_insert: &Menu,
         hosting_page_path: &PagePath,
     ) -> DdResult<()> {
-        writeln!(html, "<nav class=\"site-nav {nav_class_name}\">")?;
-        if project.config.ui.hamburger_checkbox {
+        writeln!(html, "<nav class=\"site-nav")?;
+        for class in classes {
+            write!(html, " {}", class.as_str())?;
+        }
+        writeln!(html, "\">")?;
+        if menu_insert.hamburger_checkbox {
             html.push_str(
                 "<input type=checkbox id=nav-toggle class=nav-toggle>\n\
                  <label for=nav-toggle class=nav-toggle-label>☰</label>\n",
             );
         }
-        self.push_nav_item_html(html, project, hosting_page_path);
+        self.push_nav_item_html(html, hosting_page_path);
         html.push_str("</nav>\n");
         Ok(())
     }
@@ -130,16 +134,15 @@ impl Menu {
     fn push_nav_item_html(
         &self,
         html: &mut String,
-        project: &Project,
         hosting_page_path: &PagePath,
     ) {
         html.push_str("<ul class=\"nav-menu\">\n");
         for (title, item) in &self.items {
             let (link, selected) = match item {
-                MenuItem::Page(path) => {
+                ListItem::Page(path) => {
                     (hosting_page_path.link_to(path), path == hosting_page_path)
                 }
-                MenuItem::SubMenu(submenu) => {
+                ListItem::List(submenu) => {
                     let first_page_path = submenu.first_page_path();
                     let link = first_page_path
                         .as_ref()
@@ -154,8 +157,8 @@ impl Menu {
                 "<li class=\"nav-item {}\"><a href=\"{}\">{}</a>",
                 selected_class, link, title,
             );
-            if let MenuItem::SubMenu(submenu) = item {
-                submenu.push_nav_item_html(html, project, hosting_page_path);
+            if let ListItem::List(submenu) = item {
+                submenu.push_nav_item_html(html, hosting_page_path);
             }
             html.push_str("</li>\n");
         }
@@ -163,11 +166,11 @@ impl Menu {
     }
 }
 
-impl MenuItem {
+impl ListItem {
     pub fn first_page_path(&self) -> Option<PagePath> {
         match self {
-            MenuItem::Page(path) => Some(path.clone()),
-            MenuItem::SubMenu(submenu) => submenu.first_page_path(),
+            ListItem::Page(path) => Some(path.clone()),
+            ListItem::List(submenu) => submenu.first_page_path(),
         }
     }
 }

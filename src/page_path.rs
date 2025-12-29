@@ -25,7 +25,7 @@ impl PagePath {
         let mut dir: Vec<String> = path
             .split('/')
             .filter(|part| !part.is_empty())
-            .map(|s| s.to_owned())
+            .map(std::borrow::ToOwned::to_owned)
             .collect();
         let stem = if stem.is_empty() {
             if let Some(s) = dir.pop() {
@@ -170,7 +170,7 @@ impl FromStr for PagePath {
             .trim_end_matches('/')
             .split('/')
             .filter(|part| !part.is_empty())
-            .map(|s| s.to_owned())
+            .map(std::borrow::ToOwned::to_owned)
             .collect();
         let stem = stem.to_owned();
         Ok(Self { dir, stem })

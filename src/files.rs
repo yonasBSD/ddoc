@@ -42,10 +42,8 @@ pub fn project_subdirectory(parent: &Path) -> Option<std::path::PathBuf> {
     let read_dir = std::fs::read_dir(parent).ok()?;
     for entry in read_dir.flatten() {
         let path = entry.path();
-        if path.is_dir() {
-            if Project::load(&path).is_ok() {
-                return Some(path);
-            }
+        if path.is_dir() && Project::load(&path).is_ok() {
+            return Some(path);
         }
     }
     None

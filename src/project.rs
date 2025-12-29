@@ -29,11 +29,12 @@ impl Project {
     /// Given the path to a ddoc project root,
     /// load its configuration and pages into a `Project` struct.
     pub fn load(path: &Path) -> DdResult<Self> {
-        let (config, config_path) = Config::at_root(path)?;
+        let (mut config, config_path) = Config::at_root(path)?;
+        config.fix_old();
         let src_path = path.join("src");
         let pages = FxHashMap::default();
         let build_path = path.join("site");
-        let nav = config.menu.clone();
+        let nav = config.site_map.clone();
         let mut project = Self {
             config,
             config_path,
@@ -110,7 +111,7 @@ impl Project {
                         return Ok(false); // might be a readme, etc.
                     }
                     if let Ok(rel_img) = rel_path.strip_prefix("img/") {
-                        info!("Deployed image {:?}", rel_img);
+                        info!("Deployed image {rel_img:?}");
                         eprintln!("Deployed image {}", rel_img.to_string_lossy().yellow());
                         let dst_path = self.build_path.join("img").join(rel_img);
                         if let Some(parent) = dst_path.parent() {
@@ -148,7 +149,7 @@ impl Project {
             new_config
         };
         self.pages.clear();
-        let nav = self.config.menu.clone();
+        let nav = self.config.site_map.clone();
         nav.add_pages(self);
         self.build()?;
         Ok(())
@@ -295,14 +296,14 @@ impl Project {
         if src == "--previous" {
             return self
                 .config
-                .menu
+                .site_map
                 .previous(page_path)
                 .map(|dst_page_path| page_path.link_to(dst_page_path));
         }
         if src == "--next" {
             return self
                 .config
-                .menu
+                .site_map
                 .next(page_path)
                 .map(|dst_page_path| page_path.link_to(dst_page_path));
         }
@@ -385,7 +386,7 @@ impl Project {
     }
 }
 
-/// Copy normal non hidden files from src_dir to dst_dir recursively
+/// Copy normal non hidden files from `src_dir` to `dst_dir` recursively
 fn copy_normal_recursive(
     src_dir: &Path,
     dst_dir: &Path,
