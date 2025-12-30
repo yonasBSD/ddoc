@@ -28,7 +28,7 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
-const DEBOUNCE_DELAY_MS: u64 = 100;
+const DEBOUNCE_DELAY_MS: u64 = 40;
 
 #[derive(Debug)]
 pub enum FileChange {

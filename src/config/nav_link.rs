@@ -15,7 +15,7 @@ pub struct NavLink {
     pub alt: Option<String>,
     #[serde(alias = "url")]
     pub href: Option<String>,
-    /// Deprecated: prefer to set class on the element key (i.e. ddoc-link.<class>)
+    /// Deprecated: prefer to set class on the element key (i.e. ddoc-link.class)
     pub class: Option<String>,
     pub target: Option<String>,
 }

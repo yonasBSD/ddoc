@@ -1,7 +1,7 @@
 mod attribute;
-mod composite_element;
 mod element;
 mod element_key;
+mod element_list;
 mod menu;
 mod nav_component;
 mod nav_link;
@@ -9,9 +9,9 @@ mod page_list;
 
 pub use {
     attribute::*,
-    composite_element::*,
     element::*,
     element_key::*,
+    element_list::*,
     menu::*,
     nav_component::*,
     nav_link::*,
@@ -42,12 +42,12 @@ pub struct Config {
     #[serde(alias = "pages", alias = "menu")]
     pub site_map: PageList,
     pub favicon: Option<String>,
-    /// for compatibility with ddoc (0.10-), this is loaded but only used
+    /// for compatibility with ddoc (0.11-), this is loaded but only used
     /// through conversion to the new `body` field
     #[serde(flatten)]
     old: NavComponents,
     #[serde(default)]
-    pub body: CompositeElement,
+    pub body: ElementList,
 }
 
 impl Config {
@@ -75,7 +75,7 @@ impl Config {
     pub fn needs_search_script(&self) -> bool {
         self.body.has_href("--search")
     }
-    /// For support of old ddoc versions (<= 0.10), convert old nav components
+    /// For support of old ddoc versions (<= 0.11), convert old nav components
     /// if the new `body` field is empty
     pub fn fix_old(&mut self) {
         if self.body.children.is_empty() {

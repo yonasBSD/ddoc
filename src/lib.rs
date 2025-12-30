@@ -33,7 +33,7 @@
 //!
 //! This updates a `site` directory, whose content can be sent to your server.
 //!
-//! If you want to test it locally, you may run
+//! To test it locally, run
 //!
 //! ```bash
 //! ddoc --serve

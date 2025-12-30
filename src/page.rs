@@ -43,7 +43,7 @@ impl Page {
             );
             return Ok(());
         };
-        let page_writer = PageWriter::new(self, project, md)?;
+        let page_writer = PageWriter::new(self, project, &md)?;
         page_writer.write_html(html)
     }
 }

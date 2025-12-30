@@ -7,7 +7,7 @@ use {
     },
 };
 
-/// Deprecated navigation components structure for compatibility with ddoc <= 0.10
+/// Deprecated navigation components structure for compatibility with ddoc <= 0.11
 #[derive(Debug, Clone, Deserialize)]
 pub struct NavComponents {
     #[serde(default)]
@@ -18,7 +18,7 @@ pub struct NavComponents {
     ui: UiOptions,
 }
 
-/// Either the header or footer navigation configuration for ddoc <= 0.10
+/// Either the header or footer navigation configuration for ddoc <= 0.11
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[serde(transparent)]
 struct NavDir {
@@ -33,9 +33,9 @@ enum NavComponent {
 }
 
 impl NavComponents {
-    /// Build a CompositeElement from old-style NavComponents, adding the
-    /// parts which were implicit in ddoc <= 0.10
-    pub fn into_body_composite(&self) -> CompositeElement {
+    /// Build a `ElementList` from old-style `NavComponents`, adding the
+    /// parts which were implicit in ddoc <= 0.11
+    pub fn into_body_composite(&self) -> ElementList {
         let mut children = Vec::new();
         if !self.header.is_empty() {
             children.push(Element::new_composite(
@@ -56,7 +56,7 @@ impl NavComponents {
                 self.footer.to_children(&self.ui),
             ));
         }
-        CompositeElement { children }
+        ElementList { children }
     }
 }
 impl NavDir {

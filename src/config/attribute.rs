@@ -5,6 +5,7 @@ use {
 
 pub type AttributeKey = String;
 
+/// The value of an attribute in a ddoc element (`ddoc-link`, `ddoc-menu`, etc).
 #[derive(Deserialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum AttributeValue {
@@ -14,14 +15,14 @@ pub enum AttributeValue {
 impl AttributeValue {
     pub fn as_str(&self) -> Option<&str> {
         match self {
-            AttributeValue::String(s) => Some(s),
-            _ => None,
+            Self::String(s) => Some(s),
+            Self::Bool(_) => None,
         }
     }
     pub fn as_bool(&self) -> Option<bool> {
         match self {
-            AttributeValue::Bool(b) => Some(*b),
-            _ => None,
+            Self::String(_) => None,
+            Self::Bool(b) => Some(*b),
         }
     }
 }

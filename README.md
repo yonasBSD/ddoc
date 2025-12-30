@@ -17,7 +17,6 @@
 
 <!-- cradoc start -->
 
-
 **ddoc** is a markdown based static site generator.
 
 **Complete documentation at [https://dystroy.org/ddoc](https://dystroy.org/ddoc)**
@@ -26,11 +25,15 @@
 
 Create a directory, then move to it
 
-    mkdir website & cd website
+```bash
+mkdir website & cd website
+```
 
 Initialize the site:
 
-    ddoc --init
+```bash
+ddoc --init
+```
 
 This creates:
 
@@ -42,13 +45,17 @@ This creates:
 
 To build your site, run
 
-    ddoc
+```bash
+ddoc
+```
 
 This updates a `site` directory, whose content can be sent to your server.
 
-If you want to test it locally, you may run
+To test it locally, run
 
-    ddoc --serve
+```bash
+ddoc --serve
+```
 
 <!-- cradoc end -->
 

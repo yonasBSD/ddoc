@@ -8,19 +8,13 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
+/// A collection of elements
 #[derive(Debug, Clone, Default)]
-pub struct CompositeElement {
+pub struct ElementList {
     pub children: Vec<Element>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
-#[serde(untagged)]
-enum DeserContent {
-    Composite(CompositeElement),
-    Attributes(Attributes),
-}
-
-impl CompositeElement {
+impl ElementList {
     pub fn child(
         &self,
         index: usize,
@@ -59,9 +53,9 @@ impl CompositeElement {
     }
 }
 
-pub struct CompositeElementDeserializer {}
-impl<'de> de::Visitor<'de> for CompositeElementDeserializer {
-    type Value = CompositeElement;
+pub struct ElementListDeserializer {}
+impl<'de> de::Visitor<'de> for ElementListDeserializer {
+    type Value = ElementList;
 
     fn expecting(
         &self,
@@ -76,6 +70,12 @@ impl<'de> de::Visitor<'de> for CompositeElementDeserializer {
     where
         M: serde::de::MapAccess<'de>,
     {
+        #[derive(Debug, Clone, Deserialize)]
+        #[serde(untagged)]
+        enum DeserContent {
+            Composite(ElementList),
+            Attributes(Attributes),
+        }
         let mut children = Vec::new();
         while let Some((key, value)) = access.next_entry::<ElementKey, DeserContent>()? {
             let ElementKey { etype, classes: _ } = key;
@@ -118,12 +118,12 @@ impl<'de> de::Visitor<'de> for CompositeElementDeserializer {
         Ok(Self::Value { children })
     }
 }
-impl<'de> de::Deserialize<'de> for CompositeElement {
+impl<'de> de::Deserialize<'de> for ElementList {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: de::Deserializer<'de>,
     {
-        deserializer.deserialize_map(CompositeElementDeserializer {})
+        deserializer.deserialize_map(ElementListDeserializer {})
     }
 }
 
@@ -196,7 +196,7 @@ fn test_composite_element_deserialization() {
         }
     }
     "#;
-    let composite: CompositeElement = deser_hjson::from_str(hjson).unwrap();
+    let composite: ElementList = deser_hjson::from_str(hjson).unwrap();
     assert_eq!(composite.children.len(), 3);
     let header = &composite.children[0];
     assert!(matches!(
@@ -204,6 +204,10 @@ fn test_composite_element_deserialization() {
         ElementContent::Menu(_)
     ));
     let article = &composite.children[1];
-    let toc = &article.children().unwrap()[0];
+    let toc = &article.children().unwrap()[0].children().unwrap()[0];
     assert!(toc.is_toc());
+    let footer = &composite.children[2];
+    assert_eq!(footer.tag(), "footer");
+    assert!(composite.has_href("--next"));
+    assert!(!composite.has_href("--top"));
 }

@@ -13,24 +13,24 @@ use {
 };
 
 pub struct PageWriter<'p> {
-    pub page: &'p Page,
-    pub project: &'p Project,
+    page: &'p Page,
+    project: &'p Project,
     /// What goes inside the `<ul class=toc-content>` tag
-    pub toc: String,
+    toc: String,
     /// What goes inside the `<main>` tag
-    pub main: String,
+    main: String,
 }
 
 impl<'p> PageWriter<'p> {
     pub fn new(
         page: &'p Page,
         project: &'p Project,
-        md: String,
+        md: &str,
     ) -> DdResult<Self> {
         let mut toc = String::new(); // stores the LIs of the nav.page-toc
         let mut main = String::new(); // stores the HTML of the <main> tag
 
-        let mut events = Parser::new_ext(&md, pcm::Options::all()).collect::<Vec<_>>();
+        let mut events = Parser::new_ext(md, pcm::Options::all()).collect::<Vec<_>>();
         for i in 0..events.len() {
             match &mut events[i] {
                 // Rewrite the image source
@@ -125,7 +125,7 @@ impl<'p> PageWriter<'p> {
     ) -> DdResult<()> {
         self.write_html_head(html)?;
         writeln!(html, "<body class=\"page-{}\">\n", &self.page_path().stem)?;
-        self.write_html_composite(html, &self.config().body)?;
+        self.write_html_element_list(html, &self.config().body)?;
         html.push_str("</html>\n");
         Ok(())
     }
@@ -182,11 +182,11 @@ impl<'p> PageWriter<'p> {
         Ok(())
     }
 
-    /// Write the HTML for the content of a CompositeElement
-    fn write_html_composite(
+    /// Write the HTML for the content of a `ElementList`
+    fn write_html_element_list(
         &self,
         html: &mut String,
-        composite: &CompositeElement,
+        composite: &ElementList,
     ) -> DdResult<()> {
         for element in &composite.children {
             self.write_element(html, element)?;
