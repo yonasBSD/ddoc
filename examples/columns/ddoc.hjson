@@ -1,0 +1,77 @@
+title: "ddoc (example of layout in columns)"
+description: "Markdown based static site generator"
+favicon: img/favicon.ico
+
+site-map: {
+    Overview: index.md
+    Usage: {
+        "Install ddoc": install.md
+        "Setup your site": setup.md
+        "Edit your site": edit.md
+    }
+    Community: {
+        "Get Help": dev.md
+        Examples: examples.md
+    }
+}
+
+body: {
+    header: {
+        ddoc-link.external-nav-link: {
+            img: img/dystroy-rust-white.svg
+            href: https://dystroy.org
+            alt: dystroy.org homepage
+        }
+        ddoc-link.home-link: {
+            href: /index.md
+            alt: ddoc homepage
+            label: ddoc (columns layout)
+        }
+        ddoc-link.external-nav-link: {
+            img: img/github-mark-white.svg
+            alt: GitHub
+            href: https://github.com/Canop/ddoc/tree/main/website
+        }
+    }
+    div.columns: {
+        ddoc-menu: {
+            hamburger-checkbox: true
+        }
+        div.center: {
+            div.page-title: {
+                ddoc-page-title: {}
+            }
+            ddoc-main: {}
+            footer: {
+                nav.made-with-ddoc: {
+                    ddoc-link: {
+                        label: made with
+                    }
+                    ddoc-link: {
+                        label: ddoc
+                        href: https://dystroy.org/ddoc
+                        class: link-to-ddoc
+                    }
+                }
+            }
+        }
+        ddoc-toc: {}
+        aside.nav-icons: {
+            ddoc-link.previous-page-link: {
+                img: img/ddoc-left-arrow.svg
+                href: --previous
+                alt: Previous Page
+            }
+            ddoc-link.search-opener: {
+                img: img/ddoc-search.svg
+                href: --search
+                alt: Search
+            }
+            ddoc-link.next-page-link: {
+                img: img/ddoc-right-arrow.svg
+                href: --next
+                alt: Next Page
+            }
+        }
+    }
+}

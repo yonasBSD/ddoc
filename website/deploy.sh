@@ -1,4 +1,4 @@
-# This script is dedicated to the official documentation site at https://dystroy.org/ddpc
+# This script is dedicated to the official documentation site at https://dystroy.org/ddoc
 
 # build the documentation site
 ddoc

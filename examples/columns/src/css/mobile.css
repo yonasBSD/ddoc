@@ -1,0 +1,52 @@
+@media (max-width: 768px) { /* mobile */
+	body:has(#nav-toggle:checked) .center {
+        visibility: hidden; /* hide main content when menu is open */
+	}
+	ul.nav-menu {
+		width: 80%;
+		flex-direction: column;
+	}
+    nav.site-nav {
+        padding: 0;
+    }
+	nav.site-nav > ul.nav-menu {
+		position: absolute;
+		top: 50px;
+		left: 45px;
+		width: calc(100% - 60px);
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-10px);
+		transition: all 0.3s ease;
+		flex-direction: column;
+		overflow-y: auto;
+		height: calc(100vh - 60px);
+        padding: 20px 0 0 20px;
+	}
+	#nav-toggle {
+		display: none; /* hide checkbox */
+	}
+	.nav-toggle-label {
+		padding: 8px 14px;
+		border-radius: 5px;
+		cursor: pointer;
+		display: inline-block;
+		user-select: none;
+        color: white;
+	}
+	/* Show menu when hamburger checkbox is checked */
+	nav.site-nav #nav-toggle:checked ~ ul.nav-menu {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+	.columns aside.nav-icons {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+    }
+	.columns nav.page-toc {
+		display: none; /* hide prev/next on small screens */
+	}
+}
+
