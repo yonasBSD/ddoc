@@ -11,6 +11,11 @@ default_job = "check"
 env.CARGO_TERM_COLOR = "always"
 env.DDOC_LOG = "debug"
 
+ignore = [
+    "examples/columns/site",
+    "examples/columns/site/*"
+]
+
 [jobs.check]
 command = ["cargo", "check"]
 need_stdout = false
@@ -108,6 +113,20 @@ allow_warnings = true
 background = false
 on_change_strategy = "kill_then_restart"
 
+[jobs.example]
+command = [
+    "cargo", "run",
+    "--",
+    "--serve",
+    "examples/columns"
+]
+watch = ["resources"]
+need_stdout = true
+need_stderr = true
+allow_warnings = true
+background = false
+on_change_strategy = "kill_then_restart"
+
 # You may define here keybindings that would be specific to
 # a project, for example a shortcut to launch a specific job.
 # Shortcuts to internal functions (scrolling, toggling, etc.)
@@ -116,3 +135,4 @@ on_change_strategy = "kill_then_restart"
 c = "job:clippy-all" # comment this to have 'c' run clippy on only the default target
 p = "job:pedantic" 
 s = "job:serve"
+e = "job:example"
