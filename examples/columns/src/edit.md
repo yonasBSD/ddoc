@@ -44,7 +44,7 @@ links.
 In both cases, ddoc will rewrite the image URL to point to the correct location whatever
 the depth of the page including the image. Your reference just has to start with `img/`.
 
-# Internal links
+# Links
 
 ## Links to pages
 

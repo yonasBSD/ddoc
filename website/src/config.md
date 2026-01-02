@@ -87,5 +87,72 @@ The generated `<body>` of a page will look like this:
 
 The `body` of the default ddoc.hjson file contains more parts than this example, so that pages have a menu, a table of content, etc.
 
-## `ddoc-` Elements
+# `ddoc-` Elements
+
+Those are special generated elements that you can define in the `body` configuration part.
+
+## ddoc-link
+
+This generates a `<a>` element with either a label, an image, etc. according to attributes:
+
+| Attribute | Meaning |
+|:-:|:-
+|img|the src of an image to display in the `<a>` element
+|alt|the alt text displayed on hovering the image, if any|
+|inline| link to a SVG file to inline (inlining your svg instead of using a `<img>` element allows for greater CSS or JS control|
+|label|the label (if you provide both an image and a label, the image comes first)
+|href|content of the `href` attribute of the `<a>` element (recomputed depending on the page if a link to another page or a served resource - see [links](/edit#links))
+|target|target attribute to set on the `<a>` element
+
+## ddoc-page-title
+
+This just inserts the title of the page, with no tag.
+
+Example:
+
+```Hjson
+body: {
+    header: {
+        div.page-title: {
+            ddoc-page-title: {}
+        }
+    }
+    ddoc-main: {}
+}
+```
+
+## ddoc-menu
+
+This includes the `<nav.site-nav>` element allowing site navigation, displayed as a menu, foldable or not, depending on your stylesheets.
+
+To ease presentation as a no-javascript hamburger menu, a checkbox can be optionally included:
+
+```Hjson
+body: {
+    header: {
+        ddoc-menu: {
+            hamburger-checkbox: true
+        }
+    }
+    ddoc-main: {}
+}
+```
+
+## ddoc-toc
+
+The Table-Of-Content starts with the page title then contains, in a `<ul>` list, `<li><a>` links to `<h1>` to `<h4>` titles.
+
+You usually don't want to show all levels in your TOC, or not on all pages. CSS should be used to define what's shown.
+For example to hide levels `<h3>` and `<h4>` on the `index` page, add this in your CSS:
+
+```CSS
+body.page-index nav.page-toc .h3, body.page-index nav.page-toc .h4 {
+	display: none;
+}
+```
+
+## ddoc-main
+
+This is the HTML generated from the Markdown's file of the page.
+
 
