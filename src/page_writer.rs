@@ -1,5 +1,6 @@
 use {
     crate::*,
+    lazy_regex::regex_remove,
     pulldown_cmark::{
         self as pcm,
         CowStr,
@@ -202,7 +203,7 @@ impl<'p> PageWriter<'p> {
     ) -> DdResult<()> {
         match &element.content {
             ElementContent::Html { tag, children } => {
-                writeln!(html, "<{}", tag)?;
+                write!(html, "<{}", tag)?;
                 if !element.classes.is_empty() {
                     html.push_str(" class=\"");
                     for (i, class) in element.classes.iter().enumerate() {
@@ -213,7 +214,7 @@ impl<'p> PageWriter<'p> {
                     }
                     html.push('"');
                 }
-                html.push('>');
+                html.push_str(">\n");
                 for child in children {
                     self.write_element(html, child)?;
                 }
@@ -290,7 +291,7 @@ impl<'p> PageWriter<'p> {
         if let Some(target) = &link.target {
             write!(html, " target=\"{target}\"")?;
         }
-        html.push('>');
+        html.push_str(">\n");
         if let Some(img) = &link.img {
             let img_url = self.project.img_url(img, self.page_path());
             write!(html, "<img src=\"{img_url}\"")?;
@@ -304,6 +305,9 @@ impl<'p> PageWriter<'p> {
         if let Some(path) = &link.inline {
             match self.project.load_file(path)? {
                 Some(content) => {
+                    // we clean the content from xml or doctype declarations
+                    let content = regex_remove!(r"<\?xml[^>]*>\s*"i, &content);
+                    let content = regex_remove!(r"<!DOCTYPE[^>]*>\s*", &content);
                     html.push_str(&content);
                 }
                 None => {

@@ -114,11 +114,12 @@ impl PageList {
         menu_insert: &Menu,
         hosting_page_path: &PagePath,
     ) -> DdResult<()> {
-        writeln!(html, "<nav class=\"site-nav")?;
+        html.push_str("<nav class=\"site-nav");
         for class in classes {
-            write!(html, " {}", class.as_str())?;
+            html.push(' ');
+            html.push_str(class.as_str());
         }
-        writeln!(html, "\">")?;
+        html.push_str("\">\n");
         if menu_insert.hamburger_checkbox {
             html.push_str(
                 "<input type=checkbox id=nav-toggle class=nav-toggle>\n\

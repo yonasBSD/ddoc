@@ -18,7 +18,7 @@ cli-log = "2.1"
 crossbeam = "0.8"
 deser-hjson = "2.2.5"
 indexmap = {version = "2.7", features = ["serde"]}
-lazy-regex = "3.4"
+lazy-regex = "3.5"
 notify = "8.2.0"
 pulldown-cmark = "0.13.0"
 rouille = "3.6"
@@ -29,3 +29,5 @@ termimad = "0.34"
 thiserror = "2"
 toml = "0.9"
 
+[patch.crates-io]
+# lazy-regex = { path = "../lazy-regex" }

@@ -1,7 +1,7 @@
 
 **ddoc** is developed by **Denys Séguret**, also known as [Canop](https://github.com/Canop) or [dystroy](https://dystroy.org).
 
-# Discuss ddoc in a chat room
+# Discuss ddoc
 
 The best place to chat about ddoc, to talk about features or bugs, or to get help, is the Miaou chat:
 

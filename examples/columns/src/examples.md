@@ -13,7 +13,7 @@ See the source at [https://github.com/Canop/ddoc/tree/main/website](https://gith
 
 [This example site](https://dystroy.org/ddoc-columns) features a different layout, with the site navigation permanentely visible on the left.
 
-See the source at [https://github.com/Canop/ddoc/tree/main/example/columns](https://github.com/Canop/ddoc/tree/main/example/columns)
+See the source at [https://github.com/Canop/ddoc/tree/main/examples/columns](https://github.com/Canop/ddoc/tree/main/examples/columns)
 
 # bacon
 
