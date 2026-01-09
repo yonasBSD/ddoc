@@ -314,7 +314,7 @@ impl<'p> PageWriter<'p> {
                     eprintln!(
                         "{}: file not found in ddoc-link configuration: {}",
                         "error".red().bold(),
-                        path.to_string().red(),
+                        path.clone().red(),
                     );
                 }
             }

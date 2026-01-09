@@ -2,6 +2,9 @@
  * you probably don't wabt to take them for your own site
  */
 
+body {
+    overflow-y: scroll; /* prevent shifting when navigating between pages with/without scrollbar */
+}
 body.page-index footer {
     display: none;
 }
