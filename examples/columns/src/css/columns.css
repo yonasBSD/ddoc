@@ -160,6 +160,40 @@ div.page-title {
 .page-toc .toc-title {
     display: none;
 }
+.page-toc .toc-content {
+    padding-inline-start: 0;
+}
+.page-toc li {
+    display: block;
+}
+.page-toc .toc-item {
+    border-left: solid 3px transparent;
+    transition: border-left 0.4s;
+}
+.page-toc .toc-item.h1 {
+    padding-left: 7px;
+}
+.page-toc .toc-item.h2 {
+    padding-left: 19px;
+}
+.page-toc .toc-item.h3 {
+    padding-left: 30px;
+}
+.page-toc .toc-item.active {
+    border-left: solid 3px var(--header-fg-accent);
+    transition: border-left 0.4s;
+}
+.page-toc .toc-item a {
+    color: var(--header-fg);
+    text-decoration: none;
+}
+.page-toc .toc-item.active a {
+    color: var(--header-fg-accent);
+}
+.page-toc .toc-item a:hover {
+    color: var(--header-fg-accent);
+}
+
 
 @media (min-width: 768px) { /* wide screens */
 	#nav-toggle, .nav-toggle-label { /* hide hamburger on wide screens */

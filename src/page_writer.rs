@@ -170,6 +170,14 @@ impl<'p> PageWriter<'p> {
                 .static_url("js", "ddoc-search.js", self.page_path());
             writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
         }
+        if self.config().needs_toc_activate_script() {
+            let url = self.project.static_url(
+                "js",
+                "ddoc-toc-activate-visible-item.js",
+                self.page_path(),
+            );
+            writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
+        }
         for e in self.project.list_css()? {
             let url = self
                 .project
@@ -231,7 +239,7 @@ impl<'p> PageWriter<'p> {
                     self.page_path(),
                 )?;
             }
-            ElementContent::Toc => {
+            ElementContent::Toc(_) => {
                 html.push_str("<nav class=page-toc>\n");
                 html.push_str("<a class=toc-title href=\"#top\">");
                 html.push_str(&escape_text(&self.page.title));

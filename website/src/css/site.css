@@ -6,6 +6,7 @@
 	--bg: #fdfdfd;
 	--nav-bg: linear-gradient(#444,#222);
 	--toc-bg: linear-gradient(#444,#222);
+	--toc-active-border: 3px solid #aaa;
 	--nav-fg: #fff;
 	--link-fg: #000;
 	--code-fg: #111;
@@ -393,6 +394,12 @@ nav.page-toc .toc-content {
 	align-items: stretch;
 }
 
+nav.page-toc .toc-item {
+	border-right: 3px solid transparent;
+}
+nav.page-toc .toc-item.active {
+	border-right: var(--toc-active-border);
+}
 nav.page-toc .toc-item:hover {
 	background: var(--hovered-menu-bg);
 }

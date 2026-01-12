@@ -46,7 +46,10 @@ impl NavComponents {
         children.push(Element::new_composite(
             "article",
             vec![
-                Element::new_composite("aside.page-nav", vec![ElementContent::Toc.into()]),
+                Element::new_composite(
+                    "aside.page-nav",
+                    vec![ElementContent::Toc(Toc::default()).into()],
+                ),
                 ElementContent::Main.into(),
             ],
         ));

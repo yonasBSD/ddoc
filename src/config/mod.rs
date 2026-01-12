@@ -6,6 +6,7 @@ mod menu;
 mod nav_component;
 mod nav_link;
 mod page_list;
+mod toc;
 
 pub use {
     attribute::*,
@@ -16,6 +17,7 @@ pub use {
     nav_component::*,
     nav_link::*,
     page_list::*,
+    toc::*,
 };
 
 use {
@@ -74,6 +76,14 @@ impl Config {
     }
     pub fn needs_search_script(&self) -> bool {
         self.body.has_href("--search")
+    }
+    pub fn needs_toc_activate_script(&self) -> bool {
+        self.body.has(|element: &Element| {
+            if let ElementContent::Toc(toc) = &element.content {
+                return toc.activate_visible_item;
+            }
+            false
+        })
     }
     /// For support of old ddoc versions (<= 0.11), convert old nav components
     /// if the new `body` field is empty

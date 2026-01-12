@@ -142,7 +142,29 @@ body: {
 
 The Table-Of-Content starts with the page title then contains, in a `<ul>` list, `<li><a>` links to `<h1>` to `<h4>` titles.
 
+Example:
+
+```Hjson
+article: {
+    aside.page-nav: {
+        ddoc-toc: {
+            activate-visible-item: true
+        }
+    }
+    ddoc-main: {}
+}
+```
+
+### Show what item is viewed
+
+When `activate-visible-item` is `true`, a script is injected in the page so that the TOC follows scroll and selection.
+
+If you don't want this feature, or if you want to use your own script for that, set this property to `false`.
+
+### Select the visible items
+
 You usually don't want to show all levels in your TOC, or not on all pages. CSS should be used to define what's shown.
+
 For example to hide levels `<h3>` and `<h4>` on the `index` page, add this in your CSS:
 
 ```CSS
@@ -150,6 +172,8 @@ body.page-index nav.page-toc .h3, body.page-index nav.page-toc .h4 {
 	display: none;
 }
 ```
+
+Note: the default CSS has those `display:none` for `<h3>` and `<h4>`, you may remove those lines if you want to show all levels in the TOC.
 
 ## ddoc-main
 

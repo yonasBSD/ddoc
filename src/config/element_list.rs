@@ -37,19 +37,32 @@ impl ElementList {
             child.visit(&mut f);
         }
     }
+    pub fn has<F>(
+        &self,
+        mut f: F,
+    ) -> bool
+    where
+        F: FnMut(&Element) -> bool,
+    {
+        for child in &self.children {
+            if child.has(&mut f) {
+                return true;
+            }
+        }
+        false
+    }
     pub fn has_href(
         &self,
         href: &str,
     ) -> bool {
-        let mut found = false;
-        self.visit(|element: &Element| {
+        self.has(|element: &Element| {
             if let ElementContent::Link(link) = &element.content {
                 if link.href.as_deref() == Some(href) {
-                    found = true;
+                    return true;
                 }
             }
-        });
-        found
+            false
+        })
     }
 }
 
@@ -94,8 +107,12 @@ impl<'de> de::Visitor<'de> for ElementListDeserializer {
                     let menu_insert: Menu = attrs.into();
                     ElementContent::Menu(menu_insert)
                 }
+                (ElementType::Toc, DeserContent::Attributes(attrs)) => {
+                    let toc: Toc = attrs.into();
+                    ElementContent::Toc(toc)
+                }
                 (ElementType::Menu, _) => ElementContent::Menu(Menu::default()),
-                (ElementType::Toc, _) => ElementContent::Toc,
+                (ElementType::Toc, _) => ElementContent::Toc(Toc::default()),
                 (ElementType::Main, _) => ElementContent::Main,
                 (ElementType::PageTitle, _) => ElementContent::PageTitle,
                 (etype, value) => {

@@ -56,7 +56,9 @@ body: {
                 }
             }
         }
-        ddoc-toc: {}
+        ddoc-toc: {
+            activate-visible-item: true
+        }
         aside.nav-icons: {
             ddoc-link.previous-page-link: {
                 inline: img/ddoc-left-arrow.svg

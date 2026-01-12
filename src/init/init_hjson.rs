@@ -67,7 +67,12 @@ body: {
     }
     article: {
         aside.page-nav: {
-            ddoc-toc: {}
+            ddoc-toc: {
+                // if true, a script is injected to highlight the part the user
+                // is currently viewing (the 'active' class is added to the
+                // corresponding TOC item)
+                activate-visible-item: true
+            }
         }
         ddoc-main: {}
     }

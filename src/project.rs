@@ -14,6 +14,10 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
+static SEARCH_JS_BYTES: &[u8] = include_bytes!("../resources/js/ddoc-search.js");
+static TOC_ACTIVATE_JS_BYTES: &[u8] =
+    include_bytes!("../resources/js/ddoc-toc-activate-visible-item.js");
+
 /// A ddoc project, with its configuration, pages, and
 /// location which allows building it.
 pub struct Project {
@@ -54,19 +58,27 @@ impl Project {
         self.copy_static("js")?;
         self.copy_static("css")?;
         if self.config.needs_search_script() {
-            let search_js_path = self.build_path.join("js").join("ddoc-search.js");
-            if !search_js_path.exists() {
-                if let Some(parent) = search_js_path.parent() {
-                    fs::create_dir_all(parent)?;
-                }
-                fs::write(
-                    &search_js_path,
-                    include_bytes!("../resources/site/js/ddoc-search.js"),
-                )?;
-            }
+            self.add_js_to_build("ddoc-search.js", SEARCH_JS_BYTES)?;
+        }
+        if self.config.needs_toc_activate_script() {
+            self.add_js_to_build("ddoc-toc-activate-visible-item.js", TOC_ACTIVATE_JS_BYTES)?;
         }
         for page_path in self.pages.keys() {
             self.build_page(page_path)?;
+        }
+        Ok(())
+    }
+    fn add_js_to_build(
+        &self,
+        filename: &str,
+        bytes: &[u8],
+    ) -> DdResult<()> {
+        let js_path = self.build_path.join("js").join(filename);
+        if !js_path.exists() {
+            if let Some(parent) = js_path.parent() {
+                fs::create_dir_all(parent)?;
+            }
+            fs::write(&js_path, bytes)?;
         }
         Ok(())
     }

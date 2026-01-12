@@ -11,7 +11,7 @@ pub enum ElementContent {
     Html { tag: String, children: Vec<Element> },
     Link(NavLink),
     Menu(Menu),
-    Toc,
+    Toc(Toc),
     Main,
     PageTitle,
 }
@@ -23,7 +23,7 @@ impl Element {
             ElementContent::Html { tag, .. } => tag,
             ElementContent::Link(_) => "ddoc-link",
             ElementContent::Menu(_) => "ddoc-menu",
-            ElementContent::Toc => "ddoc-toc",
+            ElementContent::Toc(_) => "ddoc-toc",
             ElementContent::Main => "ddoc-main",
             ElementContent::PageTitle => "ddoc-page-title",
         }
@@ -38,7 +38,7 @@ impl Element {
         matches!(self.content, ElementContent::Menu(_))
     }
     pub fn is_toc(&self) -> bool {
-        matches!(self.content, ElementContent::Toc)
+        matches!(self.content, ElementContent::Toc(_))
     }
     pub fn is_main(&self) -> bool {
         matches!(self.content, ElementContent::Main)
@@ -73,6 +73,25 @@ impl Element {
                 child.visit(f);
             }
         }
+    }
+    pub fn has<F>(
+        &self,
+        f: &mut F,
+    ) -> bool
+    where
+        F: FnMut(&Element) -> bool,
+    {
+        if f(self) {
+            return true;
+        }
+        if let Some(children) = self.children() {
+            for child in children {
+                if child.has(f) {
+                    return true;
+                }
+            }
+        }
+        false
     }
 }
 

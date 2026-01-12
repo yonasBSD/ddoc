@@ -6,56 +6,48 @@ use {
     },
 };
 
-/// The settings for the insertion of a menu in a web page.
-#[derive(Debug, Clone, Copy)]
-pub struct Menu {
-    pub hamburger_checkbox: bool,
+/// The settings for the insertion of a table of content in a web page.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Toc {
+    pub activate_visible_item: bool,
 }
 
-impl FromStr for Menu {
+impl FromStr for Toc {
     type Err = &'static str;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s != "menu" {
-            return Err("Menu must be 'menu'");
+        if s != "toc" {
+            return Err("Toc must be 'toc'");
         }
         Ok(Self {
-            hamburger_checkbox: true,
+            activate_visible_item: true,
         })
     }
 }
 
-impl Default for Menu {
-    fn default() -> Self {
-        Self {
-            hamburger_checkbox: true,
-        }
-    }
-}
-
-impl From<Attributes> for Menu {
+impl From<Attributes> for Toc {
     fn from(map: Attributes) -> Self {
-        let mut menu_insert = Menu::default();
+        let mut toc_insert = Toc::default();
         if let Some(v) = map
-            .get("hamburger_checkbox")
-            .or_else(|| map.get("hamburger-checkbox"))
+            .get("activate-visible-item")
+            .or_else(|| map.get("activate_visible_item"))
         {
             if let Some(b) = v.as_bool() {
-                menu_insert.hamburger_checkbox = b;
+                toc_insert.activate_visible_item = b;
             }
         }
-        menu_insert
+        toc_insert
     }
 }
 
-impl fmt::Display for Menu {
+impl fmt::Display for Toc {
     fn fmt(
         &self,
         f: &mut fmt::Formatter<'_>,
     ) -> fmt::Result {
-        write!(f, "menu")
+        write!(f, "toc")
     }
 }
-impl serde::Serialize for Menu {
+impl serde::Serialize for Toc {
     fn serialize<S: serde::Serializer>(
         &self,
         serializer: S,
@@ -63,7 +55,7 @@ impl serde::Serialize for Menu {
         serializer.serialize_str(&self.to_string())
     }
 }
-impl<'de> serde::Deserialize<'de> for Menu {
+impl<'de> serde::Deserialize<'de> for Toc {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let s = String::deserialize(deserializer)?;
         s.parse().map_err(serde::de::Error::custom)
