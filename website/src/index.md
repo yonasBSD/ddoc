@@ -35,7 +35,6 @@ Summarizing the goals and features of **ddoc**:
 * ddoc assumes you want to write or tune, then own, your CSS, not choose among themes
 * ddoc has no templating system - it doesn't suit every need
 * ddoc has no plugin system
-* ddoc is very new and might need fixes according to feedback
 
 # Getting Started
 
