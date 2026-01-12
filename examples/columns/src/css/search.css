@@ -1,15 +1,8 @@
 :root {
 	--text: #444;
 	--accent: #ffd700;
-	--bg: #fdfdfd;
-    --nav-bg: linear-gradient(#911300, #560819);
-	--toc-bg: linear-gradient(#444,#222);
-	--nav-fg: #fff;
-	--link-fg: #000;
-	--code-fg: #111;
-	--code-bg: #ddd;
-	--hovered-menu-bg: linear-gradient(#666, #444);
-	--mobile-submenu-bg: #222;
+    --search-nav-bg: linear-gradient(#911300, #560819);
+	--search-nav-fg: #fff;
 	--search-panel-wrapper-bg: #fffe;
 	--search-result-border: none;
 	--search-results-bg: linear-gradient(#ddd,#ccc);
@@ -41,7 +34,7 @@
 	align-items: center;
 	padding: 20px;
 	border-radius: 10px 10px 0 0;
-	background: var(--nav-bg);
+	background: var(--search-nav-bg);
 }
 .ddoc-search-controls input {
 	flex: 1 1 auto;
@@ -54,7 +47,7 @@
 	font-size: 20px;
 	font-weight: bold;
 	cursor: pointer;
-	color: var(--nav-fg);
+	color: var(--search-nav-fg);
 }
 .ddoc-search-close:hover {
 	color: var(--accent);
