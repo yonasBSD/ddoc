@@ -10,6 +10,7 @@ use {
         TagEnd,
         html::push_html,
     },
+    rustc_hash::FxHashMap,
     std::fmt::Write,
     termimad::crossterm::style::Stylize,
 };
@@ -29,6 +30,7 @@ impl<'p> PageWriter<'p> {
         project: &'p Project,
         md: &str,
     ) -> DdResult<Self> {
+        let mut id_counts = FxHashMap::default();
         let mut toc = String::new(); // stores the LIs of the nav.page-toc
         let mut main = String::new(); // stores the HTML of the <main> tag
 
@@ -82,12 +84,17 @@ impl<'p> PageWriter<'p> {
                         }
                         j += 1;
                     }
-                    let new_id = heading_text
+                    let mut new_id = heading_text
                         .to_lowercase()
                         .chars()
                         .filter(|c| c.is_alphanumeric() || *c == ' ')
                         .map(|c| if c == ' ' { '-' } else { c })
                         .collect::<String>();
+                    let count = id_counts.entry(new_id.clone()).or_insert(0);
+                    *count += 1;
+                    if *count > 1 {
+                        new_id = format!("{}-{}", new_id, count);
+                    }
                     writeln!(
                         toc,
                         "<li class=\"toc-item {level}\"><a href=#{new_id}>{heading_text}</a></li>"
