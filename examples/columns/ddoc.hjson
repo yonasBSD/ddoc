@@ -8,7 +8,7 @@ site-map: {
         "Install ddoc": install.md
         "Setup your site": setup.md
         "Edit your site": edit.md
-        "Configure it": config.md
+        "Configuration": config.md
     }
     Community: {
         "Get Help": dev.md

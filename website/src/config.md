@@ -4,7 +4,7 @@ It's a [Hjson](https://hjson.github.io/) file.
 
 # Global Properties
 
-Quite explanatory, they're used to build the `<head>` element.
+Those simple properties used to build the `<head>` element:
 
 ```Hjson
 title: "ddoc"
@@ -155,13 +155,13 @@ article: {
 }
 ```
 
-### Show what item is viewed
+### Active TOC item
 
 When `activate-visible-item` is `true`, a script is injected in the page so that the TOC follows scroll and selection.
 
 If you don't want this feature, or if you want to use your own script for that, set this property to `false`.
 
-### Select the visible items
+### TOC depth
 
 You usually don't want to show all levels in your TOC, or not on all pages. CSS should be used to define what's shown.
 

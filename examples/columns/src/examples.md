@@ -19,7 +19,7 @@ See the source at [https://github.com/Canop/ddoc/tree/main/examples/columns](htt
 
 ![bacon](img/examples/bacon.png)
 
-bacon's website looks a lot like the one of ddoc, with different colors but the same layout.
+bacon's website looks a lot like the one of ddoc, with different colors defined with different CSS variable values.
 
 website: [https://dystroy.org/bacon](https://dystroy.org/bacon)
 
