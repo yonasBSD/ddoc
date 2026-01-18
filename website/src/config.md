@@ -14,6 +14,13 @@ favicon: img/favicon.ico
 
 As for other paths, the one to the favicon is relative to the `src` directory.
 
+## ddoc-version
+
+A site you made with the first `0.1` version of ddoc can still be built with the last version of ddoc, and it will render the same as initially,
+but the reverse isn't true: your site may need the features of a newer version.
+
+That's why you may need to set the minimal version of ddoc in your ddoc.hjson file.
+
 # Site Map
 
 This tree lists all the pages of the site, as they'll be listed in the site navigation menu.

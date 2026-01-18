@@ -52,6 +52,7 @@ mod page_writer;
 mod project;
 mod server;
 mod statics;
+mod version;
 mod watcher;
 
 pub use {
@@ -67,6 +68,7 @@ pub use {
     project::*,
     server::*,
     statics::*,
+    version::*,
     watcher::*,
 };
 

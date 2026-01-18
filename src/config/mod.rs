@@ -43,6 +43,7 @@ pub type ClassName = String;
 pub struct Config {
     pub title: String,
     pub description: Option<String>,
+    pub ddoc_version: Option<String>,
     #[serde(alias = "pages", alias = "menu")]
     pub site_map: PageList,
     pub favicon: Option<String>,

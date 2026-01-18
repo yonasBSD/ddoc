@@ -76,6 +76,19 @@ pub fn run() -> DdResult<()> {
         res => res,
     }?;
 
+    // Before everything else, we check the site doesn't require a newer ddoc version
+    if let Some(required_version) = &project.config.ddoc_version {
+        if version::is_current_version_older_than(required_version) {
+            eprintln!(
+                "{} This site requires ddoc version {} or newer (current version is {})",
+                "Error: ".red().bold(),
+                required_version.clone().yellow(),
+                DDOC_VERSION.red(),
+            );
+            return Ok(());
+        }
+    }
+
     // On launch, we clean the build directory to avoid stale files
     // (and prevent users from thinking they should edit files there)
     project.clean_build_dir()?;

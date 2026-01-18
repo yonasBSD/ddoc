@@ -9,11 +9,12 @@ use {
 
 static TEMPLATE_INIT_HJSON: &str = r#"
 # This is a configuration file for the ddoc static site generator.
-# For details and instruction, see https://dystroy.org/ddoc/
+# For details and instructions, see https://dystroy.org/ddoc/
 
 title: <title>
 description: <description>
 favicon: null // eg "img/favicon.ico"
+ddoc-version: "<ddoc-version>" // minimum required ddoc version to build this site
 
 // All pages must be listed here
 // One of them must be index.md
@@ -33,7 +34,7 @@ site-map: {
 // Elements starting with 'ddoc-' will be replaced by special items:
 // links, page TOC, global menu, main HTML translated from markdown, etc.
 //
-// Links (ddoc-link) can have { img, href, label, alt, target}.
+// Links (ddoc-link) can have { img, inline, href, label, alt, target}.
 // All these fields are optional.
 // Hrefs starting with '/' are relative to the site's root (eg '/guide/help.md')
 body: {
@@ -50,17 +51,14 @@ body: {
             ddoc-link.previous-page-link: {
                 inline: img/ddoc-left-arrow.svg
                 href: --previous
-                alt: Previous Page
             }
             ddoc-link.search-opener: {
                 inline: img/ddoc-search.svg
                 href: --search
-                alt: Search
             }
             ddoc-link.next-page-link: {
                 inline: img/ddoc-right-arrow.svg
                 href: --next
-                alt: Next Page
             }
             <github-navlink>
         }
@@ -122,6 +120,7 @@ pub fn init_hjson_in_dir(
         hjson = hjson
             .replace("<title>", &escape_hjson_string(title))
             .replace("<description>", &escape_hjson_string(description))
+            .replace("<ddoc-version>", DDOC_VERSION)
             .replace("<github-navlink>", &github_navlink);
 
         fs::write(&path, hjson)?;

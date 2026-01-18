@@ -1,6 +1,7 @@
 title: "ddoc"
 description: "Markdown based static site generator"
 favicon: img/favicon.ico
+ddoc-version: "0.16" // minimal version of ddoc
 
 site-map: {
     Overview: index.md
