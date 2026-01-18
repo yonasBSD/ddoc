@@ -20,6 +20,8 @@ You should not have to deal with uncompatible versions of node/Python/whatever, 
 
 You should also not have to deal with huge imported theming CSS files full of `!important` and crumbling under their complexity.
 
+Once built, the site should be deployable on any standard http server, whatever the location and path depth, and whatever the proxies.
+
 Summarizing the goals and features of **ddoc**:
 
 * A reliable static site generator for documentation sites

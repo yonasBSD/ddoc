@@ -30,14 +30,14 @@ footer .made-with-ddoc {
 	justify-content: center;
 	padding: 50px 0 20px 0;
 }
-footer nav.made-with-ddoc a.nav-link, footer nav.made-with-ddoc a.nav-link:hover {
+footer .made-with-ddoc a.nav-link, footer .made-with-ddoc a.nav-link:hover {
 	color: var(--text);
 	opacity: 0.4;
 }
-footer nav.made-with-ddoc a.nav-link.link-to-ddoc {
+footer .made-with-ddoc a.nav-link.link-to-ddoc {
 	font-weight: bold;
 }
-footer nav.made-with-ddoc a.nav-link.link-to-ddoc:hover {
+footer .made-with-ddoc a.nav-link.link-to-ddoc:hover {
 	opacity: 0.8;
 	text-decoration: underline;
 }

@@ -308,6 +308,26 @@ impl Project {
             eprintln!("Error: link to non-existing page: {:?}", page_path);
         }
     }
+
+    pub fn previous_page(
+        &self,
+        current_page: &PagePath,
+    ) -> Option<&Page> {
+        self.config
+            .site_map
+            .previous(current_page)
+            .and_then(|p| self.pages.get(p))
+    }
+    pub fn next_page(
+        &self,
+        current_page: &PagePath,
+    ) -> Option<&Page> {
+        self.config
+            .site_map
+            .next(current_page)
+            .and_then(|p| self.pages.get(p))
+    }
+
     /// Return a modified link URL if it needs to be rewritten,
     /// return `None` if no rewriting is needed.
     pub fn maybe_rewrite_link_url(

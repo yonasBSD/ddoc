@@ -1,11 +1,12 @@
 mod attribute;
+mod before_0_11;
 mod element;
 mod element_key;
 mod element_list;
 mod menu;
-mod nav_component;
 mod nav_link;
 mod page_list;
+mod text;
 mod toc;
 
 pub use {
@@ -14,14 +15,15 @@ pub use {
     element_key::*,
     element_list::*,
     menu::*,
-    nav_component::*,
     nav_link::*,
     page_list::*,
+    text::*,
     toc::*,
 };
 
 use {
     crate::*,
+    before_0_11::NavComponents,
     serde::{
         Deserialize,
         Serialize,
@@ -89,7 +91,7 @@ impl Config {
     /// if the new `body` field is empty
     pub fn fix_old(&mut self) {
         if self.body.children.is_empty() {
-            self.body = self.old.into_body_composite();
+            self.body = self.old.to_body_composite();
         }
     }
 }

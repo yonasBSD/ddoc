@@ -26,7 +26,11 @@ body: {
         ddoc-link.home-link: {
             href: /index.md
             alt: ddoc homepage
-            label: ddoc (columns layout)
+            label: ddoc
+        }
+        ddoc-link.search-opener.mobile: { // mobile only
+            inline: img/ddoc-search.svg
+            href: --search
         }
         ddoc-link.external-nav-link: {
             inline: img/github-mark.svg
@@ -40,40 +44,45 @@ body: {
         }
         div.center: {
             div.page-title: {
-                ddoc-page-title: {}
+                text: --current-page-title
             }
             ddoc-main: {}
+            nav.prev-next: {
+                ddoc-link.previous-page-link: {
+                    inline: img/ddoc-left-arrow.svg
+                    href: --previous
+                    alt: Previous Page
+                    label: --previous-page-title
+                }
+                ddoc-link.next-page-link: {
+                    label: --next-page-title
+                    inline: img/ddoc-right-arrow.svg
+                    href: --next
+                    alt: Next Page
+                }
+            }
             footer: {
                 nav.made-with-ddoc: {
                     ddoc-link: {
                         label: made with
                     }
-                    ddoc-link: {
+                    ddoc-link.link-to-ddoc: {
                         label: ddoc
                         href: https://dystroy.org/ddoc
-                        class: link-to-ddoc
                     }
                 }
             }
         }
-        ddoc-toc: {
-            activate-visible-item: true
-        }
-        aside.nav-icons: {
-            ddoc-link.previous-page-link: {
-                inline: img/ddoc-left-arrow.svg
-                href: --previous
-                alt: Previous Page
-            }
+        div.right-column: {
             ddoc-link.search-opener: {
-                inline: img/ddoc-search.svg
                 href: --search
-                alt: Search
+                inline: img/ddoc-search.svg
             }
-            ddoc-link.next-page-link: {
-                inline: img/ddoc-right-arrow.svg
-                href: --next
-                alt: Next Page
+            div.on-this-page: {
+                text: on this page:
+            }
+            ddoc-toc: {
+                activate-visible-item: true
             }
         }
     }

@@ -1,15 +1,15 @@
 
-# Install from crates.io
+# From crates.io
 
-You need to have the Rust environment installed: [https://rustup.rs](https://rustup.rs)
+Rust must be installed: [https://rustup.rs](https://rustup.rs)
 
-Then run
+Run
 
     cargo install ddoc --locked
 
-# Install from sources
+# From sources
 
-You need to have the Rust environment installed: [https://rustup.rs](https://rustup.rs)
+Rust must be installed: [https://rustup.rs](https://rustup.rs)
 
 Clone the repository:
 
@@ -22,8 +22,4 @@ Move to its directory:
 Compile and install:
 
     cargo install --path .
-
-# Then...
-
-[Setup your site](../setup)
 

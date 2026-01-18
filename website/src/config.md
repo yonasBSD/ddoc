@@ -87,6 +87,41 @@ The generated `<body>` of a page will look like this:
 
 The `body` of the default ddoc.hjson file contains more parts than this example, so that pages have a menu, a table of content, etc.
 
+## text/html content of an element
+
+If you don't put sub elements in an element, you can put text or HTML instead, eg
+
+```Hjson
+p.help-hint: {
+    text: hit 'h' to display the help
+}
+```
+
+or
+
+```Hjson
+p.help-hint: {
+    html: "hit <span style=\"color: red;\">h</span> to display the help"
+}
+```
+
+## Special text expansions
+
+Just like some `--` prefixed strings can be used in any link (see [link expansions](/edit#expansions)), there are some expansions for text:
+
+* `--previous-page-title`: title of the previous page according to the menu
+* `--next-page-title`: title of the next page
+* `--current-page-title`: title of the current page
+
+Example:
+
+```Hjson
+div.page-title: {
+    text: --current-page-title
+}
+```
+
+
 # `ddoc-` Elements
 
 Those are special generated elements that you can define in the `body` configuration part.
@@ -99,27 +134,10 @@ This generates a `<a>` element with either a label, an image, etc. according to 
 |:-:|:-
 |img|the src of an image to display in the `<a>` element
 |alt|the alt text displayed on hovering the image, if any|
-|inline| link to a SVG file to inline (inlining your svg instead of using a `<img>` element allows for greater CSS or JS control|
-|label|the label (if you provide both an image and a label, the image comes first)
+|inline| link to a SVG file to inline (inlining your svg instead of using a `<img>` element allows for greater CSS or JS control)|
+|label|the label (if you provide both an image and a label, the order of attributes decides which comes first)
 |href|content of the `href` attribute of the `<a>` element (recomputed depending on the page if a link to another page or a served resource - see [links](/edit#links))
 |target|target attribute to set on the `<a>` element
-
-## ddoc-page-title
-
-This just inserts the title of the page, with no tag.
-
-Example:
-
-```Hjson
-body: {
-    header: {
-        div.page-title: {
-            ddoc-page-title: {}
-        }
-    }
-    ddoc-main: {}
-}
-```
 
 ## ddoc-menu
 

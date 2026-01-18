@@ -94,9 +94,16 @@ impl<'de> de::Visitor<'de> for ElementListDeserializer {
             let ElementKey { etype, classes: _ } = key;
             let content = match (etype, value) {
                 (ElementType::HtmlTag(tag), DeserContent::Composite(comp)) => {
-                    ElementContent::Html {
+                    ElementContent::DomTree {
                         tag,
                         children: comp.children,
+                    }
+                }
+                (ElementType::HtmlTag(tag), DeserContent::Attributes(attrs)) => {
+                    ElementContent::DomLeaf {
+                        tag,
+                        text: attrs.get("text").map(Text::from),
+                        raw_html: attrs.get("html").map(|v| v.to_string()),
                     }
                 }
                 (ElementType::Link, DeserContent::Attributes(attrs)) => {
@@ -223,7 +230,7 @@ fn test_composite_element_deserialization() {
     ));
     let article = &composite.children[1];
     let toc = &article.children().unwrap()[0].children().unwrap()[0];
-    assert!(toc.is_toc());
+    assert!(matches!(toc.content, ElementContent::Toc(_)));
     let footer = &composite.children[2];
     assert_eq!(footer.tag(), "footer");
     assert!(composite.has_href("--next"));

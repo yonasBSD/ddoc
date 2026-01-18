@@ -27,4 +27,16 @@ impl AttributeValue {
     }
 }
 
+impl std::fmt::Display for AttributeValue {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
+        match self {
+            Self::String(s) => write!(f, "{}", s),
+            Self::Bool(b) => write!(f, "{}", b),
+        }
+    }
+}
+
 pub type Attributes = IndexMap<AttributeKey, AttributeValue>;

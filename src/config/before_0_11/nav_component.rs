@@ -1,4 +1,5 @@
 use {
+    super::old_nav_link::OldNavLink,
     crate::*,
     indexmap::IndexMap,
     serde::{
@@ -29,13 +30,13 @@ struct NavDir {
 #[serde(untagged)]
 enum NavComponent {
     Menu(Menu),
-    NavLinks(Vec<NavLink>),
+    NavLinks(Vec<OldNavLink>),
 }
 
 impl NavComponents {
     /// Build a `ElementList` from old-style `NavComponents`, adding the
     /// parts which were implicit in ddoc <= 0.11
-    pub fn into_body_composite(&self) -> ElementList {
+    pub fn to_body_composite(&self) -> ElementList {
         let mut children = Vec::new();
         if !self.header.is_empty() {
             children.push(Element::new_composite(
@@ -85,7 +86,10 @@ impl NavDir {
                 NavComponent::NavLinks(links) => {
                     let mut nav_children = Vec::new();
                     for link in links {
-                        nav_children.push(ElementContent::Link(link.clone()).into());
+                        nav_children.push(Element {
+                            classes: link.classes(),
+                            content: ElementContent::Link(link.to_nav_link()),
+                        });
                     }
                     let mut nav = Element::new_composite("nav", nav_children);
                     nav.classes.push(class.clone());

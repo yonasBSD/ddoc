@@ -211,29 +211,91 @@ impl<'p> PageWriter<'p> {
         Ok(())
     }
 
+    fn write_page_title(
+        &self,
+        html: &mut String,
+        page: &Page,
+    ) {
+        html.push_str(&escape_text(&page.title));
+    }
+
+    fn write_text(
+        &self,
+        html: &mut String,
+        text: &Text,
+    ) {
+        match text {
+            Text::String(s) => html.push_str(&escape_text(s)),
+            Text::PreviousPageTitle => {
+                if let Some(prev_page) = self.project.previous_page(self.page_path()) {
+                    self.write_page_title(html, prev_page)
+                }
+            }
+            Text::CurrentPageTitle => self.write_page_title(html, self.page),
+            Text::NextPageTitle => {
+                if let Some(next_page) = self.project.next_page(self.page_path()) {
+                    self.write_page_title(html, next_page)
+                }
+            }
+        }
+    }
+
+    fn write_opening_tag(
+        &self,
+        html: &mut String,
+        tag: &str,
+        classes: &[String],
+    ) {
+        html.push('<');
+        html.push_str(tag);
+        if !classes.is_empty() {
+            html.push_str(" class=\"");
+            for (i, class) in classes.iter().enumerate() {
+                if i > 0 {
+                    html.push(' ');
+                }
+                html.push_str(class);
+            }
+            html.push('"');
+        }
+        html.push_str(">\n");
+    }
+    fn write_closing_tag(
+        &self,
+        html: &mut String,
+        tag: &str,
+    ) {
+        html.push_str("</");
+        html.push_str(tag);
+        html.push_str(">\n");
+    }
+
     fn write_element(
         &self,
         html: &mut String,
         element: &Element,
     ) -> DdResult<()> {
         match &element.content {
-            ElementContent::Html { tag, children } => {
-                write!(html, "<{}", tag)?;
-                if !element.classes.is_empty() {
-                    html.push_str(" class=\"");
-                    for (i, class) in element.classes.iter().enumerate() {
-                        if i > 0 {
-                            html.push(' ');
-                        }
-                        html.push_str(class);
-                    }
-                    html.push('"');
+            ElementContent::DomLeaf {
+                tag,
+                text,
+                raw_html,
+            } => {
+                self.write_opening_tag(html, tag, &element.classes);
+                if let Some(text) = text {
+                    self.write_text(html, text);
                 }
-                html.push_str(">\n");
+                if let Some(raw_html) = raw_html {
+                    html.push_str(raw_html);
+                }
+                self.write_closing_tag(html, tag);
+            }
+            ElementContent::DomTree { tag, children } => {
+                self.write_opening_tag(html, tag, &element.classes);
                 for child in children {
                     self.write_element(html, child)?;
                 }
-                writeln!(html, "</{}>", tag)?;
+                self.write_closing_tag(html, tag);
             }
             ElementContent::Link(link) => {
                 self.write_nav_link(html, &element.classes, link)?;
@@ -292,9 +354,6 @@ impl<'p> PageWriter<'p> {
             }
         }
         html.push_str(" class=\"nav-link ");
-        if let Some(class) = &link.class {
-            html.push_str(class);
-        }
         for class in classes {
             html.push(' ');
             html.push_str(class);
@@ -307,36 +366,41 @@ impl<'p> PageWriter<'p> {
             write!(html, " target=\"{target}\"")?;
         }
         html.push_str(">\n");
-        if let Some(img) = &link.img {
-            let img_url = self.project.img_url(img, self.page_path());
-            write!(html, "<img src=\"{img_url}\"")?;
-            if let Some(alt) = &link.alt {
-                let alt = escape_attr(alt);
-                write!(html, " alt=\"{alt}\"")?;
-                write!(html, " title=\"{alt}\"")?;
-            }
-            html.push('>');
-        }
-        if let Some(path) = &link.inline {
-            match self.project.load_file(path)? {
-                Some(content) => {
-                    // we clean the content from xml or doctype declarations
-                    let content = regex_remove!(r"<\?xml[^>]*>\s*"i, &content);
-                    let content = regex_remove!(r"<!DOCTYPE[^>]*>\s*", &content);
-                    html.push_str(&content);
+        for part in &link.content {
+            match part {
+                NavLinkPart::Img { src, alt } => {
+                    let img_url = self.project.img_url(src, self.page_path());
+                    write!(html, "<img src=\"{img_url}\"")?;
+                    if let Some(alt) = alt {
+                        let alt = escape_attr(alt);
+                        write!(html, " alt=\"{alt}\"")?;
+                        write!(html, " title=\"{alt}\"")?;
+                    }
+                    html.push_str(">\n");
                 }
-                None => {
-                    eprintln!(
-                        "{}: file not found in ddoc-link configuration: {}",
-                        "error".red().bold(),
-                        path.clone().red(),
-                    );
+                NavLinkPart::InlineImg { src } => {
+                    match self.project.load_file(src)? {
+                        Some(content) => {
+                            // we clean the content from xml or doctype declarations
+                            let content = regex_remove!(r"<\?xml[^>]*>\s*"i, &content);
+                            let content = regex_remove!(r"<!DOCTYPE[^>]*>\s*", &content);
+                            html.push_str(&content);
+                        }
+                        None => {
+                            eprintln!(
+                                "{}: file not found in ddoc-link configuration: {}",
+                                "error".red().bold(),
+                                src.clone().red(),
+                            );
+                        }
+                    }
+                }
+                NavLinkPart::Label(label) => {
+                    html.push_str("<span>");
+                    self.write_text(html, label);
+                    html.push_str("</span>");
                 }
             }
-        }
-        if let Some(label) = &link.label {
-            let label = escape_text(label);
-            write!(html, "<span>{label}</span>")?;
         }
         html.push_str("</a>\n");
         Ok(())

@@ -8,19 +8,29 @@ pub struct Element {
 
 #[derive(Debug, Clone)]
 pub enum ElementContent {
-    Html { tag: String, children: Vec<Element> },
+    DomLeaf {
+        tag: String,
+        text: Option<Text>,
+        raw_html: Option<String>,
+        // TODO support markdown ?
+    },
+    DomTree {
+        tag: String,
+        children: Vec<Element>,
+    },
     Link(NavLink),
     Menu(Menu),
     Toc(Toc),
     Main,
-    PageTitle,
+    PageTitle, // this one is quite obsolete now with --current-page-title
 }
 
 impl Element {
-    /// The psudo-tag of this element, as used in configuration
+    /// The pseudo-tag of this element, as used in configuration
     pub fn tag(&self) -> &str {
         match &self.content {
-            ElementContent::Html { tag, .. } => tag,
+            ElementContent::DomLeaf { tag, .. } => tag,
+            ElementContent::DomTree { tag, .. } => tag,
             ElementContent::Link(_) => "ddoc-link",
             ElementContent::Menu(_) => "ddoc-menu",
             ElementContent::Toc(_) => "ddoc-toc",
@@ -28,24 +38,9 @@ impl Element {
             ElementContent::PageTitle => "ddoc-page-title",
         }
     }
-    pub fn is_html(&self) -> bool {
-        matches!(self.content, ElementContent::Html { .. })
-    }
-    pub fn is_link(&self) -> bool {
-        matches!(self.content, ElementContent::Link(_))
-    }
-    pub fn is_menu(&self) -> bool {
-        matches!(self.content, ElementContent::Menu(_))
-    }
-    pub fn is_toc(&self) -> bool {
-        matches!(self.content, ElementContent::Toc(_))
-    }
-    pub fn is_main(&self) -> bool {
-        matches!(self.content, ElementContent::Main)
-    }
     pub fn children(&self) -> Option<&Vec<Element>> {
         match &self.content {
-            ElementContent::Html { children, .. } => Some(children),
+            ElementContent::DomTree { children, .. } => Some(children),
             _ => None,
         }
     }
@@ -58,7 +53,7 @@ impl Element {
         let classes = tokens.map(|s| s.to_string()).collect();
         Self {
             classes,
-            content: ElementContent::Html { tag, children },
+            content: ElementContent::DomTree { tag, children },
         }
     }
     pub fn visit<F>(

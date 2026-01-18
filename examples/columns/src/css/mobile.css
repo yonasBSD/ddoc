@@ -56,7 +56,7 @@
 		height: 30px;
 		margin: 10px;
 	}
-	.columns nav.page-toc {
+	.columns div.right-column {
 		display: none; /* hide prev/next on small screens */
 	}
 	div.center {
