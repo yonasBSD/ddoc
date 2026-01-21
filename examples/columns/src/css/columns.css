@@ -1,4 +1,5 @@
 :root {
+    --text: #444;
 	--bg: #fdfdfd;
     --header-height: 70px;
     --header-bg: #fafafa;
@@ -22,7 +23,7 @@ body, div, nav, main {
     min-height: 0;
     margin: 0;
     padding: 0;
-    color: #222;
+    color: var(--text);
 }
 
 body {
