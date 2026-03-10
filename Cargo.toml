@@ -18,7 +18,7 @@ cli-log = "2.1"
 crossbeam = "0.8"
 deser-hjson = "2.2.5"
 indexmap = {version = "2.7", features = ["serde"]}
-lazy-regex = "3.5"
+lazy-regex = "3.6"
 notify = "8.2.0"
 pulldown-cmark = "0.13.0"
 rouille = "3.6"
