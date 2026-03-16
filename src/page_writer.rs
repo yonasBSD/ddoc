@@ -148,7 +148,7 @@ impl<'p> PageWriter<'p> {
         html: &mut String,
     ) -> DdResult<()> {
         html.push_str(HTML_START);
-        let title = format!("{} - {}", &self.page.title, &self.config().title);
+        let title = format!("{} - {}", &self.page.title, &self.config().title());
         writeln!(html, "<title>{}</title>", escape_text(&title))?;
         writeln!(
             html,
@@ -168,19 +168,18 @@ impl<'p> PageWriter<'p> {
             writeln!(html, r#"<link rel="shortcut icon" href="{url}">"#)?;
         }
         for e in self.project.list_js()? {
-            let url = self.project.static_url("js", &e.filename, self.page_path());
+            let url = self.project.static_url(&e.served_path, self.page_path());
             writeln!(html, r#"<script src="{}?m={}"></script>"#, url, e.mtime)?;
         }
         if self.config().needs_search_script() {
             let url = self
                 .project
-                .static_url("js", "ddoc-search.js", self.page_path());
+                .static_url("js/ddoc-search.js", self.page_path());
             writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
         }
         if self.config().needs_toc_activate_script() {
             let url = self.project.static_url(
-                "js",
-                "ddoc-toc-activate-visible-item.js",
+                "js/ddoc-toc-activate-visible-item.js",
                 self.page_path(),
             );
             writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
@@ -188,7 +187,7 @@ impl<'p> PageWriter<'p> {
         for e in self.project.list_css()? {
             let url = self
                 .project
-                .static_url("css", &e.filename, self.page_path());
+                .static_url(&e.served_path, self.page_path());
             writeln!(
                 html,
                 r#"<link href="{}?m={}" rel=stylesheet>"#,

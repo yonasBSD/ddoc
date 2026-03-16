@@ -15,7 +15,7 @@ pub enum ListItem {
     List(PageList),
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Default, Clone, Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct PageList {
     pub items: IndexMap<String, ListItem>,

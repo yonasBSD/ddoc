@@ -1,5 +1,8 @@
 use {
-    super::old_nav_link::OldNavLink,
+    super::{
+        old_nav_link::OldNavLink,
+        ui_options::UiOptions,
+    },
     crate::*,
     indexmap::IndexMap,
     serde::{
@@ -9,7 +12,7 @@ use {
 };
 
 /// Deprecated navigation components structure for compatibility with ddoc <= 0.11
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize)]
 pub struct NavComponents {
     #[serde(default)]
     header: NavDir,

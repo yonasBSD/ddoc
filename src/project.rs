@@ -22,41 +22,85 @@ static TOC_ACTIVATE_JS_BYTES: &[u8] =
 /// location which allows building it.
 pub struct Project {
     pub root: PathBuf,
-    pub config: Config,
-    pub config_path: PathBuf,
-    pub pages: FxHashMap<PagePath, Page>,
     pub src_path: PathBuf,
     pub build_path: PathBuf,
+    pub config: Config,
+    modules: Vec<Module>,
+    pub pages: FxHashMap<PagePath, Page>,
 }
 
 impl Project {
     /// Given the path to a ddoc project root,
     /// load its configuration and pages into a `Project` struct.
     pub fn load(path: &Path) -> DdResult<Self> {
-        let (mut config, config_path) = Config::at_root(path)?;
-        config.fix_old();
-        let src_path = path.join("src");
-        let pages = FxHashMap::default();
-        let build_path = path.join("site");
-        let nav = config.site_map.clone();
         let mut project = Self {
-            config,
-            config_path,
             root: path.to_owned(),
-            pages,
-            src_path: src_path.clone(),
-            build_path,
+            config: Default::default(),
+            modules: Default::default(),
+            pages: Default::default(),
+            src_path: path.join("src"),
+            build_path: path.join("site"),
         };
-        nav.add_pages(&mut project);
+        project.load_content()?;
         Ok(project)
     }
+
+    /// List the files and directories that should be watched for changes to
+    /// trigger a partial or total rebuild of the project.
+    pub fn watch_targets(&self) -> Vec<WatchTarget> {
+        let mut targets = Vec::new();
+        for module in &self.modules {
+            module.add_watch_targets(&mut targets);
+        }
+        targets
+    }
+
+    /// Load or reload everything, keeping only the root path
+    fn load_content(
+        &mut self,
+    ) -> DdResult<()> {
+        // clean
+        self.modules = Vec::new();
+        self.pages.clear();
+
+        // load all modules, including the main
+        let main_module = Module::load("", &self.root)?;
+        let mut config = main_module
+            .config
+            .clone()
+            .ok_or_else(|| DdError::ConfigNotFound)?
+            .take_entity();
+        eprintln!("main config: {:#?}", config);
+        let active_plugins = config.active_plugins.clone();
+        self.modules.push(main_module);
+        for name in &active_plugins {
+            let plugin_root = self.root.join("plugins").join(name);
+            let plugin_module = Module::load(name, &plugin_root)?;
+            if let Some(plugin_config) = &plugin_module.config {
+                config
+                    .merge(plugin_config.as_ref());
+            }
+            // TODO merge plugin config into main config
+            self.modules.push(plugin_module);
+        }
+
+        // fix and apply config
+        config.fix_old();
+        config.site_map.add_pages(self);
+
+        // store it
+        self.config = config;
+        Ok(())
+    }
+
     /// Fills the 'site' directory with the generated HTML files and static files
     ///
     /// Don't do any prealable cleaning, call `clean_build_dir` first if needed.
     pub fn build(&self) -> DdResult<()> {
-        self.copy_static("img")?;
-        self.copy_static("js")?;
-        self.copy_static("css")?;
+        for module in &self.modules {
+            eprintln!("Deploying module '{}'", module.name.clone().yellow());
+            module.copy_all_statics_into(&self.build_path)?;
+        }
         if self.config.needs_search_script() {
             self.add_js_to_build("ddoc-search.js", SEARCH_JS_BYTES)?;
         }
@@ -92,6 +136,7 @@ impl Project {
         change: FileChange,
         base_url: &str, // for informing the user on the link to look at
     ) -> DdResult<bool> {
+        eprintln!("Received change: {:?}", change);
         match change {
             FileChange::Other => {
                 self.reload_and_rebuild(base_url)?;
@@ -149,21 +194,17 @@ impl Project {
     ) -> DdResult<()> {
         info!("full rebuild");
         eprintln!("Full rebuild of {}", base_url.yellow());
-        self.config = {
-            let Ok(new_config) = read_file::<Config, _>(&self.config_path) else {
-                eprintln!(
-                    "{}: could not read updated config file at {:?}, keeping the old one.",
-                    "warning".yellow().bold(),
-                    &self.config_path
-                );
-                return Ok(());
-            };
-            new_config
-        };
-        self.pages.clear();
-        let nav = self.config.site_map.clone();
-        nav.add_pages(self);
-        self.build()?;
+        match self.load_content() {
+            Ok(()) => {
+                self.build()?;
+            }
+            Err(DdError::ConfigNotFound) => eprintln!(
+                "{}: could not read updated config file at {:?}, keeping the old one.",
+                "warning".yellow().bold(),
+                self.root.join(CONFIG_FILE_NAME),
+            ),
+            Err(e) => eprintln!("{}: failed to reload the project: {e}", "error".red().bold()),
+        }
         Ok(())
     }
     /// remove the 'build' directory and its content
@@ -192,12 +233,18 @@ impl Project {
         None
     }
     pub fn list_js(&self) -> DdResult<Vec<StaticEntry>> {
-        let static_src = self.src_path.join("js");
-        StaticEntry::list_in(&static_src, Some(".js"))
+        let mut entries = Vec::new();
+        for module in &self.modules {
+            module.list_js(&mut entries)?;
+        }
+        Ok(entries)
     }
     pub fn list_css(&self) -> DdResult<Vec<StaticEntry>> {
-        let static_src = self.src_path.join("css");
-        StaticEntry::list_in(&static_src, Some(".css"))
+        let mut entries = Vec::new();
+        for module in &self.modules {
+            module.list_css(&mut entries)?;
+        }
+        Ok(entries)
     }
 
     pub fn copy_static(
@@ -291,7 +338,7 @@ impl Project {
         &self,
         path: &str,
     ) -> DdResult<Option<String>> {
-        let file_path = self.src_path.join(path);
+        let file_path = self.build_path.join(path);
         if !file_path.exists() {
             return Ok(None);
         }
@@ -413,7 +460,6 @@ impl Project {
     }
     pub fn static_url(
         &self,
-        dir: &str,
         filename: &str,
         page_path: &PagePath,
     ) -> String {
@@ -422,45 +468,8 @@ impl Project {
         for _ in 0..depth {
             url.push_str("../");
         }
-        url.push_str(dir);
-        url.push('/');
         url.push_str(filename);
         url
     }
 }
 
-/// Copy normal non hidden files from `src_dir` to `dst_dir` recursively
-fn copy_normal_recursive(
-    src_dir: &Path,
-    dst_dir: &Path,
-) -> DdResult<()> {
-    if !dst_dir.exists() {
-        fs::create_dir_all(dst_dir)?;
-    }
-    for entry in fs::read_dir(src_dir)? {
-        let entry = entry?;
-        let file_type = entry.file_type()?;
-        if file_type.is_dir() {
-            let sub_src = entry.path();
-            let sub_dst = dst_dir.join(entry.file_name());
-            copy_normal_recursive(&sub_src, &sub_dst)?;
-            continue;
-        }
-        if !file_type.is_file() {
-            continue;
-        }
-        let file_name = entry.file_name();
-        let Some(file_name) = file_name.to_str() else {
-            continue;
-        };
-        if file_name.starts_with('.') {
-            continue;
-        }
-        let dest_path = dst_dir.join(file_name);
-        if dest_path.exists() {
-            fs::remove_file(&dest_path)?; // to have it updated
-        }
-        fs::copy(entry.path(), dest_path)?;
-    }
-    Ok(())
-}

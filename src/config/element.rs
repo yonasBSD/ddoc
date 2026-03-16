@@ -26,6 +26,39 @@ pub enum ElementContent {
 }
 
 impl Element {
+    pub fn try_merge(
+        &mut self,
+        other: &Element,
+    ) -> bool {
+        match (&mut self.content, &other.content) {
+            (
+                ElementContent::DomTree {
+                    children: children1,
+                    ..
+                },
+                ElementContent::DomTree {
+                    children: children2,
+                    ..
+                },
+            ) => {
+                for element in children2 {
+                    let mut merged = false;
+                    let selector2 = element.selector();
+                    for element1 in children1.iter_mut() {
+                        if element1.selector() == selector2 {
+                            merged |= element1.try_merge(element);
+                            break;
+                        }
+                    }
+                    if !merged {
+                        children1.push(element.clone());
+                    }
+                }
+                true
+            }
+            _ => false,
+        }
+    }
     /// The pseudo-tag of this element, as used in configuration
     pub fn tag(&self) -> &str {
         match &self.content {
@@ -87,6 +120,14 @@ impl Element {
             }
         }
         false
+    }
+    pub fn selector(&self) -> String {
+        let mut selector = self.tag().to_string();
+        for class in &self.classes {
+            selector.push('.');
+            selector.push_str(class.as_str());
+        }
+        selector
     }
 }
 

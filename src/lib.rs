@@ -46,12 +46,14 @@ mod error;
 mod files;
 mod html;
 mod init;
+mod module;
 mod page;
 mod page_path;
 mod page_writer;
 mod project;
 mod server;
 mod statics;
+mod sourced;
 mod version;
 mod watcher;
 
@@ -62,11 +64,13 @@ pub use {
     files::*,
     html::*,
     init::*,
+    module::*,
     page::*,
     page_path::*,
     page_writer::*,
     project::*,
     server::*,
+    sourced::*,
     statics::*,
     version::*,
     watcher::*,

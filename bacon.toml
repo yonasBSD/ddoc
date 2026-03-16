@@ -93,7 +93,8 @@ on_success = "back" # so that we don't open the browser at each change
 command = [
     "cargo", "run",
     "--",
-    "/home/dys/dev/bacon/ddoc",
+    "--serve",
+    "/home/dys/dev/bacon/website",
 ]
 need_stdout = true
 allow_warnings = true

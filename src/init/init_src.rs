@@ -59,28 +59,28 @@ pub fn init_src_in_dir(
     if !img_dir.exists() {
         fs::create_dir_all(&img_dir)?;
     }
-    write_image_if_not_exists(
-        &img_dir,
-        "ddoc-search.svg",
-        include_bytes!("../../resources/img/ddoc-search.svg"),
-    )?;
-    write_image_if_not_exists(
-        &img_dir,
-        "ddoc-left-arrow.svg",
-        include_bytes!("../../resources/img/ddoc-left-arrow.svg"),
-    )?;
-    write_image_if_not_exists(
-        &img_dir,
-        "ddoc-right-arrow.svg",
-        include_bytes!("../../resources/img/ddoc-right-arrow.svg"),
-    )?;
-    // the following image could be written only if the github navlink is used,
-    // but we'd fail people willing to add it later, so we just add it now
-    write_image_if_not_exists(
-        &img_dir,
-        "github-mark.svg",
-        include_bytes!("../../resources/img/github-mark.svg"),
-    )?;
+    // write_image_if_not_exists(
+    //     &img_dir,
+    //     "ddoc-search.svg",
+    //     include_bytes!("../../resources/img/ddoc-search.svg"),
+    // )?;
+    // write_image_if_not_exists(
+    //     &img_dir,
+    //     "ddoc-left-arrow.svg",
+    //     include_bytes!("../../resources/img/ddoc-left-arrow.svg"),
+    // )?;
+    // write_image_if_not_exists(
+    //     &img_dir,
+    //     "ddoc-right-arrow.svg",
+    //     include_bytes!("../../resources/img/ddoc-right-arrow.svg"),
+    // )?;
+    // // the following image could be written only if the github navlink is used,
+    // // but we'd fail people willing to add it later, so we just add it now
+    // write_image_if_not_exists(
+    //     &img_dir,
+    //     "github-mark.svg",
+    //     include_bytes!("../../resources/img/github-mark.svg"),
+    // )?;
 
     Ok(())
 }

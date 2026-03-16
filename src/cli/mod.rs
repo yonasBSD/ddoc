@@ -103,7 +103,7 @@ pub fn run() -> DdResult<()> {
         let server = Server::new(project.build_path.clone(), port)?;
         eprintln!(
             "Serving {} at {}",
-            project.config.title.clone().yellow().bold(),
+            project.config.title().yellow().bold(),
             server.base_url().green().bold(),
         );
 

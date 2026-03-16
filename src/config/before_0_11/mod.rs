@@ -3,5 +3,6 @@
 
 mod nav_component;
 mod old_nav_link;
+mod ui_options;
 
 pub use nav_component::*;

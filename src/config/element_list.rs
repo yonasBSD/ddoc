@@ -64,6 +64,39 @@ impl ElementList {
             false
         })
     }
+    pub fn merge(
+        &mut self,
+        other: &Self,
+    ) {
+        eprintln!(
+            "Merging element list",
+        );
+        for other_element in &other.children {
+            let mut merged = false;
+            let other_selector = other_element.selector();
+            for element in &mut self.children {
+                if element.selector() == other_selector {
+                    if element.try_merge(other_element) {
+                        eprintln!(
+                            "{}: merging element with selector {}",
+                            "info".green(),
+                            other_selector.clone().yellow()
+                        );
+                        merged = true;
+                        break;
+                    }
+                }
+            }
+            if !merged {
+                self.children.push(other_element.clone());
+                    eprintln!(
+                        "{}: adding element with selector {}",
+                        "info".green(),
+                        other_selector.clone().yellow()
+                    );
+            }
+        }
+    }
 }
 
 pub struct ElementListDeserializer {}
