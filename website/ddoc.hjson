@@ -2,18 +2,24 @@ title: "ddoc"
 description: "Markdown based static site generator"
 favicon: img/favicon.ico
 ddoc-version: "0.16" // minimal version of ddoc
+vars: {
+    github-url: https://github.com/Canop/ddoc
+    home-title: ddoc
+    // home-icon: /img/logo-white.svg
+}
 
 active-plugins: [
-    //"theme-red"
     "dystroy-foss"
-    "theme-top-menu"
+    // "theme-top-menu"
+    "theme-columns"
 ]
 
 site-map: {
     Overview: index.md
     Usage: {
         "Install ddoc": install.md
-        "Setup your site": setup.md
+        "Setup": setup.md
+        "Plugins": plugins.md
         "Edit your site": edit.md
         "Configuration": config.md
     }

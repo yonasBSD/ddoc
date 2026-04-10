@@ -1,5 +1,9 @@
 /* standard classes and general style */
 
+/* colors and common styles
+*   You can override those variables in a separate CSS file
+*   in the main src/css directory
+*/
 :root {
 	--text: #444;
 	--accent: #000;
@@ -39,6 +43,7 @@
 html, body, div, nav, header {
 	margin: 0;
 	padding: 0;
+	box-sizing: border-box;
 }
 html {
 	scroll-padding-top: 100px;

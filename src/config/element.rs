@@ -12,6 +12,7 @@ pub enum ElementContent {
         tag: String,
         text: Option<Text>,
         raw_html: Option<String>,
+        attributes: Attributes,
         // TODO support markdown ?
     },
     DomTree {

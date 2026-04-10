@@ -7,7 +7,7 @@ body: {
             ddoc-link.home-link: {
                 href: /index.md
                 alt: ddoc homepage
-                label: ddoc
+                label: --title
             }
         }
         ddoc-menu: {
@@ -22,7 +22,7 @@ body: {
             ddoc-link.external-nav-link.github: {
                 inline: img/github-mark.svg
                 alt: GitHub
-                href: https://github.com/Canop/ddoc
+                href: --github-url
             }
         }
     }

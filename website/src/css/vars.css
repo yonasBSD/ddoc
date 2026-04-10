@@ -1,0 +1,36 @@
+:root {
+	--text: #444;
+	--accent: #000;
+	--bg: #fdfdfd;
+	--nav-bg: #eee;
+	--nav-fg: #333;
+	--header-border: thin solid #bbb;
+	--header-shadow: none;
+	--menu-head-border: none;
+	--selected-menu-head-border: none;
+	--hovered-menu-bg: #ddd;
+	--mobile-submenu-bg: #eee;
+	--toc-bg: var(--nav-bg);
+	--hovered-toc-item-bg: var(--hovered-menu-bg);
+	--toc-inactive-border: 4px solid transparent;
+	--toc-active-border: 4px solid #ffd700;
+	--prev-next-separator: none;
+	--prev-next-border: thin solid #bbb3;
+	--prev-next-bg: var(--toc-bg);
+	--hovered-prev-next-bg: var(--hovered-toc-item-bg);
+	--link-fg: #000;
+	--hovered-link-bg: #ffd700;
+	--code-fg: #111;
+	--code-bg: #e8e8e8;
+	--search-panel-wrapper-bg: #fffe;
+	--search-controls-bg: #c0a61982;
+	--search-results-border: none;
+	--search-result-border: none;
+	--search-results-bg: linear-gradient(#eee,#ddd);
+	--search-result-link-fg: #000c;
+	--selected-search-result-bg: #3335;
+	--hovered-search-result-link-fg: #000;
+	--thead-border: thin solid #aaa;
+	--tr-border: thin solid #d1dadf75;
+}
+

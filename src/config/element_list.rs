@@ -68,20 +68,12 @@ impl ElementList {
         &mut self,
         other: &Self,
     ) {
-        eprintln!(
-            "Merging element list",
-        );
         for other_element in &other.children {
             let mut merged = false;
             let other_selector = other_element.selector();
             for element in &mut self.children {
                 if element.selector() == other_selector {
                     if element.try_merge(other_element) {
-                        eprintln!(
-                            "{}: merging element with selector {}",
-                            "info".green(),
-                            other_selector.clone().yellow()
-                        );
                         merged = true;
                         break;
                     }
@@ -89,11 +81,6 @@ impl ElementList {
             }
             if !merged {
                 self.children.push(other_element.clone());
-                    eprintln!(
-                        "{}: adding element with selector {}",
-                        "info".green(),
-                        other_selector.clone().yellow()
-                    );
             }
         }
     }
@@ -132,11 +119,14 @@ impl<'de> de::Visitor<'de> for ElementListDeserializer {
                         children: comp.children,
                     }
                 }
-                (ElementType::HtmlTag(tag), DeserContent::Attributes(attrs)) => {
+                (ElementType::HtmlTag(tag), DeserContent::Attributes(mut attrs)) => {
+                    let text = attrs.shift_remove("text").map(Text::from);
+                    let raw_html = attrs.shift_remove("html").map(|v| v.to_string());
                     ElementContent::DomLeaf {
                         tag,
-                        text: attrs.get("text").map(Text::from),
-                        raw_html: attrs.get("html").map(|v| v.to_string()),
+                        text,
+                        raw_html,
+                        attributes: attrs,
                     }
                 }
                 (ElementType::Link, DeserContent::Attributes(attrs)) => {

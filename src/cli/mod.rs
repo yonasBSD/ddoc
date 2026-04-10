@@ -5,7 +5,6 @@ pub use args::*;
 use {
     crate::*,
     clap::Parser,
-    std::path::Path,
     termimad::crossterm::style::Stylize,
 };
 
@@ -25,14 +24,16 @@ pub fn run() -> DdResult<()> {
     }
 
     if args.version {
-        println!("cradoc {}", env!("CARGO_PKG_VERSION"));
+        println!("ddoc {}", env!("CARGO_PKG_VERSION"));
         return Ok(());
     }
 
-    let project_path = args.path.as_deref().unwrap_or(Path::new("."));
+    let Some(project_path) = args.project_path() else {
+        return Ok(()); // error already printed by args.project_path()
+    };
 
     if args.init {
-        return match init_ddoc_project(project_path) {
+        return match init_ddoc_project(&project_path) {
             Err(DdError::InitNotPossible(reason)) => {
                 eprintln!(
                     "{}\n{}",
@@ -45,12 +46,27 @@ pub fn run() -> DdResult<()> {
         };
     }
 
-    let project_path = project_path.canonicalize().map_err(|error| DdError::Read {
-        path: project_path.to_owned(),
-        error,
-    })?;
+    let project_res = Project::load(&project_path);
+    let project_opt = project_res.as_ref().ok();
 
-    let project = match Project::load(&project_path) {
+    if args.list_plugins {
+        EmbeddedPlugin::print_list(project_opt);
+        return Ok(());
+    }
+    if let Some(plugin_name) = args.init_plugin {
+        let Some(plugin) = EmbeddedPlugin::get(&plugin_name) else {
+            eprintln!(
+                "{} No plugin named {} found",
+                "Error:".red().bold(),
+                plugin_name.yellow(),
+            );
+            return Ok(());
+        };
+        plugin.init(&project_path)?;
+        return Ok(());
+    }
+
+    let project = match project_res {
         Err(DdError::ConfigNotFound) => {
             // A frequent error is to run ddoc in a super director
             // of a ddoc project, so we check for that

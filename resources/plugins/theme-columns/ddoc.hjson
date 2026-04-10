@@ -1,0 +1,66 @@
+title: "columns theme"
+description: A theme featuring the menu on left
+
+
+body: {
+    aside.left-container: {
+        header: {
+            ddoc-link.home-nav-logo: {
+                img: --home-icon
+                href: /index.md
+                alt: homepage
+            }
+            ddoc-link.home-link: {
+                href: /index.md
+                alt: ddoc homepage
+                label: --home-title
+            }
+            ddoc-link.search-opener: {
+                inline: img/ddoc-search.svg
+                href: --search
+            }
+            ddoc-menu: {
+                hamburger-checkbox: true
+            }
+            ddoc-link.external-nav-link: {
+                inline: img/github-mark.svg
+                alt: GitHub
+                href: --github-url
+            }
+        }
+    }
+    div.page: {
+        div.main-container: {
+            a.page-title: {
+                href: "#top"
+                text: --current-page-title
+            }
+            ddoc-main: {}
+            nav.prev-next: {
+                ddoc-link.previous-page-link: {
+                    inline: img/ddoc-left-arrow.svg
+                    href: --previous
+                    alt: Previous Page
+                    label: --previous-page-title
+                }
+                ddoc-link.next-page-link: {
+                    label: --next-page-title
+                    inline: img/ddoc-right-arrow.svg
+                    href: --next
+                    alt: Next Page
+                }
+            }
+            footer: {
+            }
+        }
+        div.right-column: {
+            a.on-this-page: {
+                text: "on this page:"
+                href: "#top"
+            }
+            ddoc-toc: {
+                activate-visible-item: true
+            }
+        }
+    }
+}

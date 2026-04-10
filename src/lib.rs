@@ -51,9 +51,10 @@ mod page;
 mod page_path;
 mod page_writer;
 mod project;
+mod resources;
 mod server;
-mod statics;
 mod sourced;
+mod statics;
 mod version;
 mod watcher;
 
@@ -69,6 +70,7 @@ pub use {
     page_path::*,
     page_writer::*,
     project::*,
+    resources::*,
     server::*,
     sourced::*,
     statics::*,

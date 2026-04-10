@@ -27,6 +27,10 @@ impl StaticEntry {
     /// returning a `StaticEntry` for each one.
     ///
     /// Hidden files and directories (those starting with `.`) are ignored.
+    ///
+    /// If a file with the same `served_path` already exists in `entries`, the
+    /// previous one is kept and the new one is skipped, as the plugin entry
+    /// is overridden by the main project entry.
     pub fn list_in(
         dir: &Path,
         serving_prefix: &str,
@@ -76,6 +80,14 @@ impl StaticEntry {
                     .as_secs();
                 let relative = src_path.strip_prefix(dir).unwrap_or(&src_path);
                 let served_path = format!("{}{}", serving_prefix, relative.to_string_lossy());
+                if entries.iter().any(|e| e.served_path == served_path) {
+                    eprintln!(
+                        "Warning: duplicate static entry for {}, skipping {}",
+                        served_path,
+                        src_path.display()
+                    );
+                    continue;
+                }
                 entries.push(Self {
                     served_path,
                     mtime,

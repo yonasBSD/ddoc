@@ -39,9 +39,22 @@ pub fn init_ddoc_project(dir: &Path) -> DdResult<()> {
     }
     let dir = dir.canonicalize()?;
 
-    eprintln!("Initializing ddoc project in {}", dir.display());
+    eprintln!(
+        "Initializing ddoc project in {}",
+        dir.display().to_string().yellow().bold()
+    );
 
     let init_values = InitValues::guess(&dir)?;
+
+    // plugins
+    let plugins_dir = dir.join("plugins");
+    if !plugins_dir.exists() {
+        fs::create_dir_all(&plugins_dir)?;
+        eprintln!("Initialized default plugins {}", plugins_dir.display());
+        for plugin in &init_values.plugins {
+            plugin.init(&dir)?;
+        }
+    }
 
     // ddoc.hjson
     let config = match init_hjson_in_dir(&dir, &init_values) {

@@ -24,6 +24,7 @@ pub use {
 use {
     crate::*,
     before_0_11::NavComponents,
+    indexmap::IndexMap,
     serde::Deserialize,
     std::path::Path,
 };
@@ -49,6 +50,8 @@ pub struct Config {
     old: NavComponents,
     #[serde(default)]
     pub body: ElementList,
+    #[serde(default)]
+    pub vars: IndexMap<String, String>,
 }
 
 impl Config {
@@ -77,6 +80,17 @@ impl Config {
     pub fn favicon(&self) -> Option<&str> {
         self.favicon.as_deref().filter(|s| !s.is_empty())
     }
+    pub fn var(
+        &self,
+        name: &str,
+    ) -> Option<String> {
+        match name {
+            "title" => Some(self.title().to_string()),
+            "description" => self.description().map(|s| s.to_string()),
+            "favicon" => self.favicon().map(|s| s.to_string()),
+            _ => self.vars.get(name).cloned(),
+        }
+    }
     pub fn needs_search_script(&self) -> bool {
         self.body.has_href("--search")
     }
@@ -101,10 +115,6 @@ impl Config {
         &mut self,
         other: &Config,
     ) {
-        eprintln!(
-            "Merging config: main title {:?}, plugin title {:?}",
-            self.title, other.title
-        );
         if self.title.is_none() {
             self.title = other.title.clone();
         }

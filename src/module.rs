@@ -1,10 +1,8 @@
 use {
     crate::*,
-    std::{
-        path::{
-            Path,
-            PathBuf,
-        },
+    std::path::{
+        Path,
+        PathBuf,
     },
 };
 
@@ -46,22 +44,32 @@ impl Module {
         entries: &mut Vec<StaticEntry>,
     ) -> DdResult<()> {
         let static_src = self.src_path.join(subdir);
-        let prefix = if self.name.is_empty() {
-            format!("{}/", subdir)
-        } else {
-            format!("{}/{}/", subdir, self.name)
-        };
+        let prefix = format!("{}/", subdir);
+        //let prefix = if self.name.is_empty() {
+        //    format!("{}/", subdir)
+        //} else {
+        //    format!("{}/{}/", subdir, self.name)
+        //};
         StaticEntry::list_in(&static_src, &prefix, ext_filter, entries)
     }
 
-    pub fn list_js(&self, entries: &mut Vec<StaticEntry>) -> DdResult<()> {
+    pub fn list_js(
+        &self,
+        entries: &mut Vec<StaticEntry>,
+    ) -> DdResult<()> {
         self.list_static_entries_in("js", Some(".js"), entries)
     }
-    pub fn list_css(&self, entries: &mut Vec<StaticEntry>) -> DdResult<()> {
+    pub fn list_css(
+        &self,
+        entries: &mut Vec<StaticEntry>,
+    ) -> DdResult<()> {
         self.list_static_entries_in("css", Some(".css"), entries)
     }
 
-    pub fn add_watch_targets(&self, targets: &mut Vec<WatchTarget>) {
+    pub fn add_watch_targets(
+        &self,
+        targets: &mut Vec<WatchTarget>,
+    ) {
         if let Some(config) = &self.config {
             let config_path = config.src();
             targets.push(WatchTarget::new_file(config_path));
@@ -79,7 +87,7 @@ impl Module {
         if !static_src.exists() {
             return Ok(());
         }
-        let static_dst = build_root.join(dir).join(&self.name);
+        let static_dst = build_root.join(dir); //.join(&self.name);
         copy_normal_recursive(&static_src, &static_dst)?;
         Ok(())
     }

@@ -12,6 +12,7 @@ pub struct InitValues {
     pub description: Option<String>,
     pub index: Option<PathBuf>,
     pub github_repo: Option<String>,
+    pub plugins: Vec<EmbeddedPlugin>,
 }
 
 impl InitValues {
@@ -38,6 +39,7 @@ impl InitValues {
                 init_values.index = Some(readme_path);
             }
         }
+        init_values.plugins = EmbeddedPlugin::all();
         Ok(init_values)
     }
 }

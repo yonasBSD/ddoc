@@ -1,7 +1,7 @@
 use {
     crate::*,
+    indexmap::IndexMap,
     std::{
-        borrow::Cow,
         fs,
         path::Path,
     },
@@ -16,74 +16,77 @@ description: <description>
 favicon: null // eg "img/favicon.ico"
 ddoc-version: "<ddoc-version>" // minimum required ddoc version to build this site
 
-// All pages must be listed here
-// One of them must be index.md
-// You can have submenus, eg:
-// pages: {
-//     Home: index.md
-//     Guide: {
-//         "Getting Started": guide/getting_started.md
-//         "Advanced Topics": guide/advanced_topics.md
-//     }
-// }
+# You may add variables here and use them in elements of this config or
+# of plugins with --var-name
+vars: <vars>
+
+# plugins to activate for this site
+active-plugins: [
+<plugin-list>
+]
+
+# All pages must be listed here
+# One of them must be index.md
+# You can have submenus, eg:
+# pages: {
+#     Home: index.md
+#     Guide: {
+#         "Getting Started": guide/getting_started.md
+#         "Advanced Topics": guide/advanced_topics.md
+#     }
+# }
 site-map: {
     Home: index.md
 }
 
-// This describes the content of the <body> element of each page.
-// Elements starting with 'ddoc-' will be replaced by special items:
-// links, page TOC, global menu, main HTML translated from markdown, etc.
-//
-// Links (ddoc-link) can have { img, inline, href, label, alt, target}.
-// All these fields are optional.
-// Hrefs starting with '/' are relative to the site's root (eg '/guide/help.md')
-body: {
-    header: {
-        nav.before-menu: {
-            // this is a good place for a logo or a link to a wider site
-        }
-        ddoc-menu: {
-            // if true, the generated HTML includes a checkbox which
-            // can be styled into a hamburger menu for small screens
-            hamburger-checkbox: true
-        }
-        nav.after-menu: {
-            ddoc-link.previous-page-link: {
-                inline: img/ddoc-left-arrow.svg
-                href: --previous
-            }
-            ddoc-link.search-opener: {
-                inline: img/ddoc-search.svg
-                href: --search
-            }
-            ddoc-link.next-page-link: {
-                inline: img/ddoc-right-arrow.svg
-                href: --next
-            }
-            <github-navlink>
-        }
-    }
-    article: {
-        aside.page-nav: {
-            ddoc-toc: {
-                // if true, a script is injected to highlight the part the user
-                // is currently viewing (the 'active' class is added to the
-                // corresponding TOC item)
-                activate-visible-item: true
-            }
-        }
-        ddoc-main: {}
-    }
-    footer: {
-    }
-}
+// # This describes the content of the <body> element of each page.
+// # Elements starting with 'ddoc-' will be replaced by special items:
+// # links, page TOC, global menu, main HTML translated from markdown, etc.
+// #
+// # Links (ddoc-link) can have { img, inline, href, label, alt, target}.
+// # All these fields are optional.
+// # Hrefs starting with '/' are relative to the site's root (eg '/guide/help.md')
+// body: {
+//     header: {
+//         nav.before-menu: {
+//             // this is a good place for a logo or a link to a wider site
+//         }
+//         ddoc-menu: {
+//             // if true, the generated HTML includes a checkbox which
+//             // can be styled into a hamburger menu for small screens
+//             hamburger-checkbox: true
+//         }
+//         nav.after-menu: {
+//             ddoc-link.previous-page-link: {
+//                 inline: img/ddoc-left-arrow.svg
+//                 href: --previous
+//             }
+//             ddoc-link.search-opener: {
+//                 inline: img/ddoc-search.svg
+//                 href: --search
+//             }
+//             ddoc-link.next-page-link: {
+//                 inline: img/ddoc-right-arrow.svg
+//                 href: --next
+//             }
+//         }
+//     }
+//     article: {
+//         aside.page-nav: {
+//             ddoc-toc: {
+//                 // if true, a script is injected to highlight the part the user
+//                 // is currently viewing (the 'active' class is added to the
+//                 // corresponding TOC item)
+//                 activate-visible-item: true
+//             }
+//         }
+//         ddoc-main: {}
+//     }
+//     footer: {
+//     }
+// }
 
 "#;
-static TEMPLATE_GITHUB_NAVLINK: &str = r#"ddoc-link.external-nav-link: {
-                inline: img/github-mark.svg
-                alt: GitHub
-                href: <url>
-            }"#;
 
 /// Initialize a ddoc.hjson file in the specified directory
 /// (do nothing if one already exists)
@@ -111,17 +114,28 @@ pub fn init_hjson_in_dir(
         let mut hjson = TEMPLATE_INIT_HJSON.to_owned();
         let title = init_values.title.as_deref().unwrap_or("Unnamed Site");
         let description = init_values.description.as_deref().unwrap_or("");
-        let github_navlink = if let Some(github_repo) = &init_values.github_repo {
-            TEMPLATE_GITHUB_NAVLINK.replace("<url>", github_repo).into()
-        } else {
-            Cow::Borrowed("// links here will appear after the menu")
-        };
+
+        let mut plugin_list = String::new();
+        for plugin in &init_values.plugins {
+            if plugin.is_default() {
+                plugin_list.push_str(&format!("    {}\n", plugin.name()));
+            } else {
+                plugin_list.push_str(&format!("    //{}\n", plugin.name()));
+            }
+        }
+
+        let mut vars: IndexMap<String, String> = IndexMap::default();
+        if let Some(github_repo) = &init_values.github_repo {
+            vars.insert("github-url".to_string(), github_repo.to_string());
+        }
+        let vars = serde_json::to_string_pretty(&vars).unwrap_or_else(|_| "{}".to_string());
 
         hjson = hjson
             .replace("<title>", &escape_hjson_string(title))
             .replace("<description>", &escape_hjson_string(description))
             .replace("<ddoc-version>", DDOC_VERSION)
-            .replace("<github-navlink>", &github_navlink);
+            .replace("<plugin-list>", &plugin_list)
+            .replace("<vars>", &vars);
 
         fs::write(&path, hjson)?;
         eprintln!("Created {}", path.display());

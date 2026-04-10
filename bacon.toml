@@ -88,13 +88,13 @@ command = ["cargo", "doc", "--no-deps", "--open"]
 need_stdout = false
 on_success = "back" # so that we don't open the browser at each change
 
-# Run on the bacon directory
+# serve - pass the path to the site as argument to launch
 [jobs.run]
 command = [
     "cargo", "run",
     "--",
     "--serve",
-    "/home/dys/dev/bacon/website",
+    "--",
 ]
 need_stdout = true
 allow_warnings = true

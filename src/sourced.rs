@@ -1,6 +1,6 @@
-use {
-    std::path::PathBuf,
-    std::path::Path,
+use std::path::{
+    Path,
+    PathBuf,
 };
 
 #[derive(Debug, Clone)]
@@ -9,7 +9,10 @@ pub struct Sourced<E> {
     entity: E,
 }
 impl<E> Sourced<E> {
-    pub fn new(entity: E, src: PathBuf) -> Self {
+    pub fn new(
+        entity: E,
+        src: PathBuf,
+    ) -> Self {
         Self { src, entity }
     }
 
@@ -51,4 +54,3 @@ impl<E> std::ops::Deref for Sourced<E> {
         &self.entity
     }
 }
-

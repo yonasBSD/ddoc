@@ -14,10 +14,6 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
-static SEARCH_JS_BYTES: &[u8] = include_bytes!("../resources/js/ddoc-search.js");
-static TOC_ACTIVATE_JS_BYTES: &[u8] =
-    include_bytes!("../resources/js/ddoc-toc-activate-visible-item.js");
-
 /// A ddoc project, with its configuration, pages, and
 /// location which allows building it.
 pub struct Project {
@@ -55,10 +51,15 @@ impl Project {
         targets
     }
 
+    pub fn plugin_names(&self) -> impl Iterator<Item = &str> {
+        self.modules
+            .iter()
+            .map(|m| m.name.as_str())
+            .filter(|name| !name.is_empty())
+    }
+
     /// Load or reload everything, keeping only the root path
-    fn load_content(
-        &mut self,
-    ) -> DdResult<()> {
+    fn load_content(&mut self) -> DdResult<()> {
         // clean
         self.modules = Vec::new();
         self.pages.clear();
@@ -68,17 +69,15 @@ impl Project {
         let mut config = main_module
             .config
             .clone()
-            .ok_or_else(|| DdError::ConfigNotFound)?
+            .ok_or(DdError::ConfigNotFound)?
             .take_entity();
-        eprintln!("main config: {:#?}", config);
         let active_plugins = config.active_plugins.clone();
         self.modules.push(main_module);
         for name in &active_plugins {
             let plugin_root = self.root.join("plugins").join(name);
             let plugin_module = Module::load(name, &plugin_root)?;
             if let Some(plugin_config) = &plugin_module.config {
-                config
-                    .merge(plugin_config.as_ref());
+                config.merge(plugin_config.as_ref());
             }
             // TODO merge plugin config into main config
             self.modules.push(plugin_module);
@@ -203,7 +202,10 @@ impl Project {
                 "warning".yellow().bold(),
                 self.root.join(CONFIG_FILE_NAME),
             ),
-            Err(e) => eprintln!("{}: failed to reload the project: {e}", "error".red().bold()),
+            Err(e) => eprintln!(
+                "{}: failed to reload the project: {e}",
+                "error".red().bold()
+            ),
         }
         Ok(())
     }
@@ -293,7 +295,7 @@ impl Project {
                 img_path = &img_path[3..];
             }
         }
-        let path = self.src_path.join(img_path);
+        let path = self.build_path.join(img_path);
         if !path.exists() {
             eprintln!(
                 "{}: {} contains a broken img src: {}",
@@ -303,36 +305,35 @@ impl Project {
             );
         }
     }
-    pub fn maybe_rewrite_img_url(
+    pub fn img_url(
         &self,
         src: &str,
         page_path: &PagePath,
-    ) -> Option<String> {
+    ) -> String {
+        let mut src = src;
+        // conf var expansions
+        let conf_var_value;
+        if let Some(var_name) = src.strip_prefix("--") {
+            if let Some(var_value) = self.config.var(var_name) {
+                conf_var_value = var_value;
+                src = &conf_var_value;
+            }
+        }
         // filtering to change only relative links to /img files
         if let Some((_, before, path)) = regex_captures!(r"^(\.\./)*(img/.*)$", &src) {
             self.check_img_path(src, page_path);
             let depth = page_path.depth();
             if depth == 0 && before.is_empty() {
-                return None; // no rewriting needed
+                return src.to_string(); // no rewriting needed, it's already correct
             }
             let mut url = String::new();
             for _ in 0..depth {
                 url.push_str("../");
             }
             url.push_str(path);
-            return Some(url);
+            return url;
         }
-        None
-    }
-    pub fn img_url<'s>(
-        &self,
-        src: &'s str,
-        page_path: &PagePath,
-    ) -> Cow<'s, str> {
-        match self.maybe_rewrite_img_url(src, page_path) {
-            Some(new_url) => Cow::Owned(new_url),
-            None => Cow::Borrowed(src),
-        }
+        src.to_string()
     }
     pub fn load_file(
         &self,
@@ -382,24 +383,35 @@ impl Project {
         src: &str,
         page_path: &PagePath,
     ) -> Option<String> {
-        // special expansions
-        if src == "--previous" {
-            return self
-                .config
-                .site_map
-                .previous(page_path)
-                .map(|dst_page_path| page_path.link_to(dst_page_path));
+        if let Some(var_name) = src.strip_prefix("--") {
+            // conf var expansions
+            if let Some(var_value) = self.config.var(var_name) {
+                return Some(var_value);
+            }
+            // dynamic expansions
+            if var_name == "previous" {
+                return self
+                    .config
+                    .site_map
+                    .previous(page_path)
+                    .map(|dst_page_path| page_path.link_to(dst_page_path));
+            }
+            if var_name == "next" {
+                return self
+                    .config
+                    .site_map
+                    .next(page_path)
+                    .map(|dst_page_path| page_path.link_to(dst_page_path));
+            }
+            if var_name == "search" {
+                return Some("javascript:ddoc_search.open();".to_string());
+            }
+            return None; // this way the container might be skipped
         }
-        if src == "--next" {
-            return self
-                .config
-                .site_map
-                .next(page_path)
-                .map(|dst_page_path| page_path.link_to(dst_page_path));
-        }
-        if src == "--search" {
-            return Some("javascript:ddoc_search.open();".to_string());
-        }
+        // FIXME rewrite absolute internal links coming from var expansions,
+        // which may be in the form /path/to/page or /path/to/page.md
+        // (this my require refactor to always return a string)
+
         // rewrite absolute internal links, making them relative to the current page
         if let Some((_, path, file, _ext, hash)) =
             regex_captures!(r"^/([\w\-/]+/)*([\w\-/]*?)(?:index)?(\.md)?/?(#.*)?$", &src,)
@@ -472,4 +484,3 @@ impl Project {
         url
     }
 }
-

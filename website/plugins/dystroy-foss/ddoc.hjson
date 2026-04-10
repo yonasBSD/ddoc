@@ -6,7 +6,7 @@ body: {
     header: {
         nav.before-menu: {
             ddoc-link.external-nav-link: {
-                inline: img/dystroy-foss/dystroy-rust-white.svg
+                inline: img/dystroy-rust-white.svg
                 href: https://dystroy.org
                 alt: dystroy.org homepage
             }
