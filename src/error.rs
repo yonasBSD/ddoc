@@ -22,6 +22,8 @@ pub enum DdError {
     Json(#[from] serde_json::Error),
     #[error("Plugin not found: {name}")]
     PluginNotFound { name: String },
+    #[error("Plugin not in site: {name}")]
+    PluginMissing { name: String },
     #[error("Failed to read {path:?}: {error}")]
     Read {
         path: std::path::PathBuf,

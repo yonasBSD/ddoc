@@ -44,8 +44,7 @@ impl<'p> PageWriter<'p> {
 
                 // rewrite internal links
                 Event::Start(Tag::Link { dest_url, .. }) => {
-                    if let Some(new_url) = project.maybe_rewrite_link_url(dest_url, &page.page_path)
-                    {
+                    if let Some(new_url) = project.rewrite_link_url(dest_url, &page.page_path) {
                         *dest_url = CowStr::from(new_url);
                     }
                 }
@@ -172,18 +171,12 @@ impl<'p> PageWriter<'p> {
             let url = self.project.static_url(&e.served_path, self.page_path());
             writeln!(html, r#"<script src="{}?m={}"></script>"#, url, e.mtime)?;
         }
-        if self.config().needs_search_script() {
-            let url = self
-                .project
-                .static_url("js/ddoc-search.js", self.page_path());
-            writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
-        }
-        if self.config().needs_toc_activate_script() {
-            let url = self
-                .project
-                .static_url("js/ddoc-toc-activate-visible-item.js", self.page_path());
-            writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
-        }
+        before_0_16::write_special_js_headers_if_needed(
+            self.page_path(),
+            self.config(),
+            &self.project,
+            html,
+        )?;
         for e in self.project.list_css()?.into_iter().rev() {
             let url = self.project.static_url(&e.served_path, self.page_path());
             writeln!(

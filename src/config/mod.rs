@@ -1,5 +1,4 @@
 mod attribute;
-mod before_0_11;
 mod element;
 mod element_key;
 mod element_list;
@@ -22,8 +21,10 @@ pub use {
 };
 
 use {
-    crate::*,
-    before_0_11::NavComponents,
+    crate::{
+        before_0_11::NavComponents,
+        *,
+    },
     indexmap::IndexMap,
     serde::Deserialize,
     std::path::Path,
@@ -47,7 +48,7 @@ pub struct Config {
     /// for compatibility with ddoc (0.11-), this is loaded but only used
     /// through conversion to the new `body` field
     #[serde(flatten)]
-    old: NavComponents,
+    pub old: NavComponents,
     #[serde(default)]
     pub body: ElementList,
     #[serde(default)]
@@ -91,23 +92,9 @@ impl Config {
             _ => self.vars.get(name).cloned(),
         }
     }
-    pub fn needs_search_script(&self) -> bool {
-        self.body.has_href("--search")
-    }
-    pub fn needs_toc_activate_script(&self) -> bool {
-        self.body.has(|element: &Element| {
-            if let ElementContent::Toc(toc) = &element.content {
-                return toc.activate_visible_item;
-            }
-            false
-        })
-    }
-    /// For support of old ddoc versions (<= 0.11), convert old nav components
-    /// if the new `body` field is empty
-    pub fn fix_old(&mut self) {
-        if self.body.children.is_empty() {
-            self.body = self.old.to_body_composite();
-        }
+
+    pub fn has_any_plugin(&self) -> bool {
+        !self.active_plugins.is_empty()
     }
 
     /// Add to this main config element the config of a plugin
@@ -123,6 +110,11 @@ impl Config {
         }
         if self.favicon.is_none() {
             self.favicon = other.favicon.clone();
+        }
+        for (key, value) in &other.vars {
+            if !self.vars.contains_key(key) {
+                self.vars.insert(key.clone(), value.clone());
+            }
         }
         for plugin in &other.active_plugins {
             if !self.active_plugins.contains(plugin) {

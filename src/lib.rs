@@ -41,6 +41,7 @@
 //!
 
 mod cli;
+mod compat;
 mod config;
 mod error;
 mod files;
@@ -60,6 +61,7 @@ mod watcher;
 
 pub use {
     cli::*,
+    compat::*,
     config::*,
     error::*,
     files::*,

@@ -75,6 +75,22 @@ impl Project {
         self.modules.push(main_module);
         for name in &active_plugins {
             let plugin_root = self.root.join("plugins").join(name);
+            if !plugin_root.exists() {
+                eprintln!(
+                    "{}: plugin '{}' not found at expected path {:?}",
+                    "error".red().bold(),
+                    name.to_string().red(),
+                    plugin_root,
+                );
+                if plugin_is_known(name) {
+                    eprintln!(
+                        " Plugin '{}' is known, but not found in the project.\n You can initialize it with {}?",
+                        name.to_string().yellow(),
+                        format!("ddoc --init-plugin {}", name).green().bold(),
+                    );
+                }
+                continue;
+            }
             let plugin_module = Module::load(name, &plugin_root)?;
             if let Some(plugin_config) = &plugin_module.config {
                 config.merge(plugin_config.as_ref());
@@ -84,7 +100,7 @@ impl Project {
         }
 
         // fix and apply config
-        config.fix_old();
+        compat::fix_old_config(&mut config);
         config.site_map.add_pages(self);
 
         // store it
@@ -97,21 +113,15 @@ impl Project {
     /// Don't do any prealable cleaning, call `clean_build_dir` first if needed.
     pub fn build(&self) -> DdResult<()> {
         for module in &self.modules {
-            eprintln!("Deploying module '{}'", module.name.clone().yellow());
             module.copy_all_statics_into(&self.build_path)?;
         }
-        if self.config.needs_search_script() {
-            self.add_js_to_build("ddoc-search.js", SEARCH_JS_BYTES)?;
-        }
-        if self.config.needs_toc_activate_script() {
-            self.add_js_to_build("ddoc-toc-activate-visible-item.js", TOC_ACTIVATE_JS_BYTES)?;
-        }
+        before_0_16::write_special_js_files_if_needed(&self.config, self)?;
         for page_path in self.pages.keys() {
             self.build_page(page_path)?;
         }
         Ok(())
     }
-    fn add_js_to_build(
+    pub fn add_js_to_build(
         &self,
         filename: &str,
         bytes: &[u8],
@@ -376,15 +386,17 @@ impl Project {
             .and_then(|p| self.pages.get(p))
     }
 
-    /// Return a modified link URL if it needs to be rewritten,
-    /// return `None` if no rewriting is needed.
-    pub fn maybe_rewrite_link_url(
+    /// Return the modified link URL.
+    /// return `None` when no expansion is possible, which should
+    /// lead to the container being skipped.
+    pub fn rewrite_link_url(
         &self,
         src: &str,
         page_path: &PagePath,
     ) -> Option<String> {
         if let Some(var_name) = src.strip_prefix("--") {
-            // conf var expansions
+            // conf var expansions, they have priority as they may overload
+            // dynamic expansions
             if let Some(var_value) = self.config.var(var_name) {
                 return Some(var_value);
             }
@@ -403,8 +415,8 @@ impl Project {
                     .next(page_path)
                     .map(|dst_page_path| page_path.link_to(dst_page_path));
             }
-            if var_name == "search" {
-                return Some("javascript:ddoc_search.open();".to_string());
+            if let Some(value) = before_0_16::expand_special_var(var_name, &self.config) {
+                return Some(value);
             }
             return None; // this way the container might be skipped
         }
@@ -465,7 +477,7 @@ impl Project {
         src: &'s str,
         page_path: &PagePath,
     ) -> Cow<'s, str> {
-        match self.maybe_rewrite_link_url(src, page_path) {
+        match self.rewrite_link_url(src, page_path) {
             Some(new_url) => Cow::Owned(new_url),
             None => Cow::Borrowed(src),
         }

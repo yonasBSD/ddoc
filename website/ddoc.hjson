@@ -12,6 +12,8 @@ active-plugins: [
     "dystroy-foss"
     // "theme-top-menu"
     "theme-columns"
+    "search"
+    "toc-activate"
 ]
 
 site-map: {

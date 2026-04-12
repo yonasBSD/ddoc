@@ -9,7 +9,7 @@ keywords = ["markdown", "doc", "html"]
 license = "AGPL-3.0"
 categories = ["command-line-utilities"]
 readme = "README.md"
-rust-version = "1.86"
+rust-version = "1.87"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive", "cargo"] }

@@ -22,7 +22,14 @@ vars: <vars>
 
 # plugins to activate for this site
 active-plugins: [
-<plugin-list>
+    # You should use only one theme plugin
+    # (or none, but then you'll have to write your own CSS and HTML elements)
+    "theme-columns"
+    // "theme-top-menu"
+
+    # Non theme plugins bring optional features
+    "search"
+    "toc-activate"
 ]
 
 # All pages must be listed here
@@ -115,15 +122,6 @@ pub fn init_hjson_in_dir(
         let title = init_values.title.as_deref().unwrap_or("Unnamed Site");
         let description = init_values.description.as_deref().unwrap_or("");
 
-        let mut plugin_list = String::new();
-        for plugin in &init_values.plugins {
-            if plugin.is_default() {
-                plugin_list.push_str(&format!("    {}\n", plugin.name()));
-            } else {
-                plugin_list.push_str(&format!("    //{}\n", plugin.name()));
-            }
-        }
-
         let mut vars: IndexMap<String, String> = IndexMap::default();
         if let Some(github_repo) = &init_values.github_repo {
             vars.insert("github-url".to_string(), github_repo.to_string());
@@ -134,7 +132,6 @@ pub fn init_hjson_in_dir(
             .replace("<title>", &escape_hjson_string(title))
             .replace("<description>", &escape_hjson_string(description))
             .replace("<ddoc-version>", DDOC_VERSION)
-            .replace("<plugin-list>", &plugin_list)
             .replace("<vars>", &vars);
 
         fs::write(&path, hjson)?;

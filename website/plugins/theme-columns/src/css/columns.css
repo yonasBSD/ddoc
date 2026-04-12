@@ -31,7 +31,7 @@ body, div, nav, main {
         flex: 0 0 850px;
     }
     div.right-column {
-        flex: 0 0 300px;
+        flex: 0 0 280px;
     }
 }
 @media (900px <= width < 1300px) {
@@ -286,14 +286,18 @@ nav.site-nav li.selected a, nav.site-nav li:has(li.selected) > a {
     color: var(--header-fg-accent);
 }
 .search-opener, .previous-page-link, .next-page-link {
-	opacity: 0.75;
+	opacity: 0.65;
 }
 .search-opener:hover, .previous-page-link:hover, .next-page-link:hover {
 	opacity: 1;
 }
-.nav-link.unexpanded,  .nav-link.unexpanded:hover {
-	opacity: 0.1;
+.nav-link {
+	opacity: 0.65;
 }
+.nav-link:hover {
+	opacity: 1;
+}
+
 
 .site-nav > .nav-menu > .nav-item:first-child {
     margin-top: 0;

@@ -46,13 +46,6 @@ pub fn run() -> DdResult<()> {
         };
     }
 
-    let project_res = Project::load(&project_path);
-    let project_opt = project_res.as_ref().ok();
-
-    if args.list_plugins {
-        EmbeddedPlugin::print_list(project_opt);
-        return Ok(());
-    }
     if let Some(plugin_name) = args.init_plugin {
         let Some(plugin) = EmbeddedPlugin::get(&plugin_name) else {
             eprintln!(
@@ -63,6 +56,14 @@ pub fn run() -> DdResult<()> {
             return Ok(());
         };
         plugin.init(&project_path)?;
+        return Ok(());
+    }
+
+    let project_res = Project::load(&project_path);
+    let project_opt = project_res.as_ref().ok();
+
+    if args.list_plugins {
+        EmbeddedPlugin::print_list(project_opt);
         return Ok(());
     }
 

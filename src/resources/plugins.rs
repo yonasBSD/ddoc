@@ -1,6 +1,5 @@
 use {
     crate::*,
-    //include_dir::{include_dir, Dir},
     rust_embed::Embed,
     std::{
         collections::HashSet,
@@ -8,8 +7,6 @@ use {
     },
     termimad::crossterm::style::Stylize,
 };
-
-static DEFAULT_PLUGIN_NAME: &str = "theme-columns";
 
 #[derive(Embed)]
 #[folder = "resources/plugins"]
@@ -38,20 +35,31 @@ impl EmbeddedPlugins {
     }
 }
 
-impl Default for EmbeddedPlugin {
-    fn default() -> Self {
-        Self {
-            name: DEFAULT_PLUGIN_NAME.to_string(),
-        }
-    }
+/// Get the bytes of a file from the plugin name and the path starting from its
+/// src/ directory (e.g. "css/main.css")
+///
+/// This function is intended for verified paths, so the returned Error is
+/// an 'Internal' one.
+pub fn resource_file_bytes(
+    plugin: &'static str,
+    file_kind: &'static str,
+    file_name: &'static str,
+) -> DdResult<Vec<u8>> {
+    let path = format!("{}/src/{}/{}", plugin, file_kind, file_name);
+    EmbeddedPlugins::get(&path)
+        .ok_or_else(|| {
+            DdError::internal(format!("File '{}' not found in embedded resources", path))
+        })
+        .map(|file| file.data.to_vec())
+}
+
+pub fn plugin_is_known(plugin: &str) -> bool {
+    EmbeddedPlugins::list_plugins().contains(&plugin.to_string())
 }
 
 impl EmbeddedPlugin {
     pub fn name(&self) -> &str {
         &self.name
-    }
-    pub fn is_default(&self) -> bool {
-        self.name == DEFAULT_PLUGIN_NAME
     }
     pub fn all() -> Vec<Self> {
         EmbeddedPlugins::list_plugins()
