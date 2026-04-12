@@ -38,6 +38,7 @@ Summarizing the goals and features of **ddoc**:
 
 * [Install ddoc](install)
 * [Setup your site](setup)
+* [Understand plugins](plugins)
 * [Edit your site](edit)
 * [Look at examples](examples)
 

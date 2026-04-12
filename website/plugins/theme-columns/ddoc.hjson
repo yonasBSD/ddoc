@@ -13,7 +13,7 @@ body: {
             ddoc-link.home-link: {
                 href: /index.md
                 alt: ddoc homepage
-                label: --home-title
+                label: --title
             }
             ddoc-link.search-opener: {
                 inline: img/ddoc-search.svg
@@ -59,7 +59,6 @@ body: {
                 href: "#top"
             }
             ddoc-toc: {
-                activate-visible-item: true
             }
         }
     }

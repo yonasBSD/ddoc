@@ -54,22 +54,19 @@ Some special values are dynamically expanded:
 
 - `--previous-page` links to the previous page according to the order defined by the pages list
 - `--next-page` links to the next page
-- `--search` opens the search dialog (and its presence triggers the inclusion of a search script)
+- `--page-title` is the title of the page while `--title` is the title of the whole site
+
+Other variable values are taken in the `vars` section of a `ddoc.hjson` (the main one having priority over the plugin ones).
 
 ## Javascript call
 
 There's no problem calling a javascript function of one of your scripts from a link.
 
-For example, you can have this in your ddoc.hjson:
+For example, you can have this in the `body` of your `ddoc.hjson`:
 
 ```Hjson
-header: {
-    left: menu
-    right: [
-        {
-            label: ping
-            href: "javascript:alert('test');"
-        }
-    ]
+ddoc-link.bipper: {
+    label: ping
+    href: "javascript:alert('test');"
 }
 ```

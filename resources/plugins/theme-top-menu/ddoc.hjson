@@ -29,7 +29,6 @@ body: {
     article: {
         aside.page-nav: {
             ddoc-toc: {
-                activate-visible-item: true
             }
         }
         div.main-content: {

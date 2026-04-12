@@ -23,6 +23,14 @@ When a property is present both in a plugin and in the main tree, when a css or 
 
 Said otherwise: a file or property of a plugin can be overriden in main (or in a plugin which appears before in the list of enabled plugins).
 
+# Embedded Plugins
+
+Some plugins are embedded in the ddoc binary and are automatically added to any new site (but most of them are not enabled):
+
+- 2 themes: **theme-columns** and **theme-top-menu**
+- **search**: brings the search feature
+- **toc-activate**: update the Table Of Content on scroll
+
 # Enable a plugin
 
 For a plugin to be enabled
