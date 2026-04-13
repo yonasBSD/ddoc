@@ -1,6 +1,6 @@
 [package]
 name = "ddoc"
-version = "0.16.0"
+version = "0.17.0"
 edition = "2024"
 authors = ["dystroy <denys.seguret@gmail.com>"]
 repository = "https://github.com/Canop/ddoc"
@@ -9,7 +9,7 @@ keywords = ["markdown", "doc", "html"]
 license = "AGPL-3.0"
 categories = ["command-line-utilities"]
 readme = "README.md"
-rust-version = "1.87"
+rust-version = "1.88"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive", "cargo"] }

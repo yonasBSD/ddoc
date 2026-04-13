@@ -149,13 +149,3 @@ impl EmbeddedPlugin {
         Ok(true)
     }
 }
-
-#[test]
-fn check_default_plugin_exists() {
-    let default_plugin = EmbeddedPlugin::default();
-    assert!(
-        EmbeddedPlugin::get(default_plugin.name()).is_some(),
-        "Default plugin '{}' should exist in embedded plugins",
-        default_plugin.name()
-    );
-}

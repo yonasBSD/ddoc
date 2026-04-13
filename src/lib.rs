@@ -22,8 +22,7 @@
 //! - a `.gitignore` file, which eases inclusion of your site in a git managed project
 //! - a `ddoc.hjson` file, holding the basic properties and navigation
 //! - a `src` folder, for your markdown files, CSS style sheets and images
-//!
-//! `/src/css/site.css` is a default CSS file, a very simple one which you can remove, or keep as basis for your own incremental changes to get the layout and look you desire.
+//! - a `plugins` folder, with default plugins
 //!
 //! To build your site, run
 //!
@@ -38,6 +37,8 @@
 //! ```bash
 //! ddoc --serve
 //! ```
+//!
+//! Then have a look at the [documentation](https://dystroy.org/ddoc/setup/) to improve your site.
 //!
 
 mod cli;

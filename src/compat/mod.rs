@@ -1,11 +1,7 @@
 pub mod before_0_11;
 pub mod before_0_16;
 
-use {
-    crate::*,
-    before_0_11::NavComponents,
-    serde::Deserialize,
-};
+use crate::*;
 
 /// For support of old ddoc versions (<= 0.11), convert old nav components
 /// if the new `body` field is empty

@@ -174,7 +174,7 @@ impl<'p> PageWriter<'p> {
         before_0_16::write_special_js_headers_if_needed(
             self.page_path(),
             self.config(),
-            &self.project,
+            self.project,
             html,
         )?;
         for e in self.project.list_css()?.into_iter().rev() {

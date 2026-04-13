@@ -19,9 +19,14 @@ body.page-examples main img {
     margin-right: auto;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
+@media (max-width: 768px) { /* mobile */
+    body.page-examples main p img {
+        max-width: 90%
+    }
+}
 @media (min-width: 768px) { /* wide screens */
-    body.page-examples main img {
-        max-width: 500px;
+    body.page-examples main p img {
+        max-width: 600px;
     }
 }
 footer .made-with-ddoc {

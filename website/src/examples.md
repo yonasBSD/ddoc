@@ -7,7 +7,7 @@ By looking at those sites and their sources, you may better see what's possible 
 
 It uses the default `theme-columns` theming plugin and the feature plugins `search` and `toc-activate`.
 
-See the source at [https://github.com/Canop/ddoc/tree/main/website](https://github.com/Canop/ddoc/tree/main/website):
+[Source on GitHub](https://github.com/Canop/ddoc/tree/main/website)
 
 # bacon
 
@@ -17,7 +17,7 @@ bacon's website uses the default `theme-top-menu` theming plugin.
 
 website: [https://dystroy.org/bacon](https://dystroy.org/bacon)
 
-Source: [https://github.com/Canop/bacon/tree/main/website](https://github.com/Canop/bacon/tree/main/website)
+[Source on GitHub](https://github.com/Canop/bacon/tree/main/website)
 
 # broot
 
@@ -29,7 +29,7 @@ broot uses additional scripts (in [/src/js](https://github.com/Canop/broot/blob/
 
 website: [https://dystroy.org/broot](https://dystroy.org/broot)
 
-Source: [https://github.com/Canop/broot/tree/main/website](https://github.com/Canop/broot/tree/main/website)
+[Source on GitHub](https://github.com/Canop/broot/tree/main/website)
 
 # dysk
 
@@ -37,5 +37,5 @@ Source: [https://github.com/Canop/broot/tree/main/website](https://github.com/Ca
 
 website: [https://dystroy.org/dysk](https://dystroy.org/dysk)
 
-Source: [https://github.com/Canop/dysk/tree/main/website](https://github.com/Canop/dysk/tree/main/website)
+[Source on GitHub](https://github.com/Canop/dysk/tree/main/website)
 
