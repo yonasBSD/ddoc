@@ -1,7 +1,7 @@
 
 # Create Pages
 
-Each page is backed by a markdown file in the `/src` directory.
+Each page is backed by a markdown file in the main `/src` directory.
 
 You may organize your files in subdirectories but you don't have to, the tree of files doesn't have to match the menu tree.
 
@@ -9,19 +9,9 @@ Each file, to be served, must be referenced in the `pages` section of the `ddoc.
 
 Standard features of CommonMark are available, including links, images, tables, etc.
 
-# Change the style
-
-You don't want to keep the neutral grey look of the default CSS.
-
-The easiest solution is to modify `src/css/site.css` to your taste, either by modifying the variables defined on top, by changing the existing rules or by adding more selective ones.
-
-As long as there's at least one file in `src/css`, `ddoc --init` won't add anything in there, nor replace the `site.css` file, so it's perfectly fine to change it.
-
-Of course you may also start from scratch with a brand new CSS file.
-
 # Add CSS files and JS files
 
-Any file matching `/src/css/*.css` or `/src/js/*.js` will be served.
+Any file matching `/src/css/*.css` or `/src/js/*.js`, either directly or in a plugin, will be served (with the nuance that when a file is present with the same name in several plugins or in main, only the one of main or the latest in the plugins list, will be served).
 
 Files are included in the HTML's head element in alphabetic order.
 
@@ -30,7 +20,7 @@ For example, on this site the `<h1>` elements of the [examples](../examples) pag
 
 # Include images
 
-Images have to be stored in `/src/img`.
+Images have to be stored in `/src/img` (in main or in a plugin).
 
 They can be included  in markdown using standard syntax:
 
@@ -64,22 +54,19 @@ Some special values are dynamically expanded:
 
 - `--previous-page` links to the previous page according to the order defined by the pages list
 - `--next-page` links to the next page
-- `--search` opens the search dialog (and its presence triggers the inclusion of a search script)
+- `--page-title` is the title of the page while `--title` is the title of the whole site
+
+Other variable values are taken in the `vars` section of a `ddoc.hjson` (the main one having priority over the plugin ones).
 
 ## Javascript call
 
 There's no problem calling a javascript function of one of your scripts from a link.
 
-For example, you can have this in your ddoc.hjson:
+For example, you can have this in the `body` of your `ddoc.hjson`:
 
 ```Hjson
-header: {
-    left: menu
-    right: [
-        {
-            label: ping
-            href: "javascript:alert('test');"
-        }
-    ]
+ddoc-link.bipper: {
+    label: ping
+    href: "javascript:alert('test');"
 }
 ```

@@ -35,8 +35,12 @@ pub fn init_src_in_dir(
             // create a default index.md
             fs::write(
                 &index_md_path,
-                "# Welcome to your new ddoc documentation site!\n\n\
-                This is the index page. You can edit this file to add your own content.\n",
+                "# Welcome\n\n\
+                This is the index page. You can edit the `index.md` file to add your own content.\n\n\
+                You can also add pages, edit CSS files, etc..\n\n\
+                # More\n\n\
+                A look at the `ddoc.hjson` file should introduce some more concepts.\n\n\
+                Then, you'll find complete information at the [documentation](https://dystroy.org/ddoc/edit/)\n\n",
             )?;
             eprintln!("Created {}", index_md_path.display());
         }
@@ -48,10 +52,7 @@ pub fn init_src_in_dir(
         fs::create_dir_all(&css_dir)?;
     }
     if !has_css(&css_dir)? {
-        fs::write(
-            css_dir.join("site.css"),
-            include_bytes!("../../resources/css/site.css"),
-        )?;
+        fs::write(css_dir.join("main.css"), MAIN_CSS_BYTES)?;
     }
 
     // src/img/
@@ -59,28 +60,6 @@ pub fn init_src_in_dir(
     if !img_dir.exists() {
         fs::create_dir_all(&img_dir)?;
     }
-    write_image_if_not_exists(
-        &img_dir,
-        "ddoc-search.svg",
-        include_bytes!("../../resources/img/ddoc-search.svg"),
-    )?;
-    write_image_if_not_exists(
-        &img_dir,
-        "ddoc-left-arrow.svg",
-        include_bytes!("../../resources/img/ddoc-left-arrow.svg"),
-    )?;
-    write_image_if_not_exists(
-        &img_dir,
-        "ddoc-right-arrow.svg",
-        include_bytes!("../../resources/img/ddoc-right-arrow.svg"),
-    )?;
-    // the following image could be written only if the github navlink is used,
-    // but we'd fail people willing to add it later, so we just add it now
-    write_image_if_not_exists(
-        &img_dir,
-        "github-mark.svg",
-        include_bytes!("../../resources/img/github-mark.svg"),
-    )?;
 
     Ok(())
 }
@@ -94,16 +73,4 @@ fn has_css(css_dir: &Path) -> DdResult<bool> {
         }
     }
     Ok(false)
-}
-
-fn write_image_if_not_exists(
-    img_dir: &Path,
-    filename: &str,
-    data: &[u8],
-) -> DdResult<()> {
-    let img_path = img_dir.join(filename);
-    if !img_path.exists() {
-        fs::write(&img_path, data)?;
-    }
-    Ok(())
 }

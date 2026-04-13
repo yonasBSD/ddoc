@@ -41,32 +41,40 @@
 //!
 
 mod cli;
+mod compat;
 mod config;
 mod error;
 mod files;
 mod html;
 mod init;
+mod module;
 mod page;
 mod page_path;
 mod page_writer;
 mod project;
+mod resources;
 mod server;
+mod sourced;
 mod statics;
 mod version;
 mod watcher;
 
 pub use {
     cli::*,
+    compat::*,
     config::*,
     error::*,
     files::*,
     html::*,
     init::*,
+    module::*,
     page::*,
     page_path::*,
     page_writer::*,
     project::*,
+    resources::*,
     server::*,
+    sourced::*,
     statics::*,
     version::*,
     watcher::*,

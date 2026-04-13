@@ -1,4 +1,6 @@
 
+ddoc may be installed either from the official crates.io registry or from sources.
+
 # From crates.io
 
 Rust must be installed: [https://rustup.rs](https://rustup.rs)

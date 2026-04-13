@@ -9,6 +9,9 @@ use {
 /// The settings for the insertion of a table of content in a web page.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Toc {
+    // This is used for compatiblity with ddoc before 0.17
+    // (for later version, enable the toc-activate plugin instead, which is more powerful and
+    // doesn't require a special script)
     pub activate_visible_item: bool,
 }
 

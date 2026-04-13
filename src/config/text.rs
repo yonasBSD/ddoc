@@ -1,6 +1,9 @@
 use {
     crate::*,
-    std::borrow::Cow,
+    std::{
+        borrow::Cow,
+        fmt,
+    },
 };
 
 #[derive(Debug, Clone)]
@@ -9,6 +12,7 @@ pub enum Text {
     PreviousPageTitle,
     CurrentPageTitle,
     NextPageTitle,
+    Var(String),
 }
 
 impl Text {
@@ -17,15 +21,28 @@ impl Text {
             "--previous-page-title" => Text::PreviousPageTitle,
             "--current-page-title" => Text::CurrentPageTitle,
             "--next-page-title" => Text::NextPageTitle,
-            _ => Text::String(s.into_owned()),
+            _ => {
+                if let Some(var_name) = s.strip_prefix("--") {
+                    Text::Var(var_name.to_string())
+                } else {
+                    Text::String(s.into_owned())
+                }
+            }
         }
     }
-    pub fn as_str(&self) -> &str {
+}
+
+impl fmt::Display for Text {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+    ) -> fmt::Result {
         match self {
-            Self::String(s) => s.as_str(),
-            Self::PreviousPageTitle => "--previous-page-title",
-            Self::CurrentPageTitle => "--current-page-title",
-            Self::NextPageTitle => "--next-page-title",
+            Self::String(s) => write!(f, "{}", s),
+            Self::PreviousPageTitle => write!(f, "--previous-page-title"),
+            Self::CurrentPageTitle => write!(f, "--current-page-title"),
+            Self::NextPageTitle => write!(f, "--next-page-title"),
+            Self::Var(var_name) => write!(f, "--{}", var_name),
         }
     }
 }
@@ -48,6 +65,14 @@ impl From<&AttributeValue> for Text {
         }
     }
 }
+impl From<AttributeValue> for Text {
+    fn from(value: AttributeValue) -> Self {
+        match value {
+            AttributeValue::String(s) => Self::from(s),
+            AttributeValue::Bool(b) => Self::String(b.to_string()),
+        }
+    }
+}
 
 impl<'de> serde::Deserialize<'de> for Text {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -60,6 +85,7 @@ impl serde::Serialize for Text {
         &self,
         serializer: S,
     ) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(self.as_str())
+        let s = self.to_string();
+        serializer.serialize_str(&s)
     }
 }

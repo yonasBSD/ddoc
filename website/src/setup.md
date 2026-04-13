@@ -14,6 +14,7 @@ This creates:
 - a `.gitignore` file, so that you don't commit the generated `site` directory
 - a `ddoc.hjson` file, holding the basic properties and navigation
 - a `src` folder, for your markdown files, CSS style sheets, scripts, and images
+- a `plugins` folder with default plugins
 
 `/src/css/site.css` is a default CSS file, a very simple one which you can remove, or keep as basis for your own incremental changes to get the layout and look you desire.
 

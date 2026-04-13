@@ -39,16 +39,12 @@ impl<'p> PageWriter<'p> {
             match &mut events[i] {
                 // Rewrite the image source
                 Event::Start(Tag::Image { dest_url, .. }) => {
-                    if let Some(new_url) = project.maybe_rewrite_img_url(dest_url, &page.page_path)
-                    {
-                        *dest_url = CowStr::from(new_url);
-                    }
+                    *dest_url = CowStr::from(project.img_url(dest_url, &page.page_path));
                 }
 
                 // rewrite internal links
                 Event::Start(Tag::Link { dest_url, .. }) => {
-                    if let Some(new_url) = project.maybe_rewrite_link_url(dest_url, &page.page_path)
-                    {
+                    if let Some(new_url) = project.rewrite_link_url(dest_url, &page.page_path) {
                         *dest_url = CowStr::from(new_url);
                     }
                 }
@@ -133,7 +129,11 @@ impl<'p> PageWriter<'p> {
         html: &mut String,
     ) -> DdResult<()> {
         self.write_html_head(html)?;
-        writeln!(html, "<body class=\"page-{}\">\n", &self.page_path().stem)?;
+        write!(html, "<body class=\"page-{}", &self.page_path().stem)?;
+        for name in self.project.plugin_names() {
+            write!(html, " plugin-{name}")?;
+        }
+        writeln!(html, "\">\n")?;
         self.write_html_element_list(html, &self.config().body)?;
         html.push_str("</html>\n");
         Ok(())
@@ -148,7 +148,7 @@ impl<'p> PageWriter<'p> {
         html: &mut String,
     ) -> DdResult<()> {
         html.push_str(HTML_START);
-        let title = format!("{} - {}", &self.page.title, &self.config().title);
+        let title = format!("{} - {}", &self.page.title, &self.config().title());
         writeln!(html, "<title>{}</title>", escape_text(&title))?;
         writeln!(
             html,
@@ -168,27 +168,17 @@ impl<'p> PageWriter<'p> {
             writeln!(html, r#"<link rel="shortcut icon" href="{url}">"#)?;
         }
         for e in self.project.list_js()? {
-            let url = self.project.static_url("js", &e.filename, self.page_path());
+            let url = self.project.static_url(&e.served_path, self.page_path());
             writeln!(html, r#"<script src="{}?m={}"></script>"#, url, e.mtime)?;
         }
-        if self.config().needs_search_script() {
-            let url = self
-                .project
-                .static_url("js", "ddoc-search.js", self.page_path());
-            writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
-        }
-        if self.config().needs_toc_activate_script() {
-            let url = self.project.static_url(
-                "js",
-                "ddoc-toc-activate-visible-item.js",
-                self.page_path(),
-            );
-            writeln!(html, r#"<script src="{}" defer></script>"#, url)?;
-        }
-        for e in self.project.list_css()? {
-            let url = self
-                .project
-                .static_url("css", &e.filename, self.page_path());
+        before_0_16::write_special_js_headers_if_needed(
+            self.page_path(),
+            self.config(),
+            &self.project,
+            html,
+        )?;
+        for e in self.project.list_css()?.into_iter().rev() {
+            let url = self.project.static_url(&e.served_path, self.page_path());
             writeln!(
                 html,
                 r#"<link href="{}?m={}" rel=stylesheet>"#,
@@ -219,11 +209,16 @@ impl<'p> PageWriter<'p> {
         html.push_str(&escape_text(&page.title));
     }
 
+    /// Write the text for a `Text` item, which can be a string or a dynamic
+    /// value like the current page title
+    ///
+    /// Return `false` in case of missing expansion (the container should probably
+    /// not be rendered)
     fn write_text(
         &self,
         html: &mut String,
         text: &Text,
-    ) {
+    ) -> bool {
         match text {
             Text::String(s) => html.push_str(&escape_text(s)),
             Text::PreviousPageTitle => {
@@ -237,7 +232,14 @@ impl<'p> PageWriter<'p> {
                     self.write_page_title(html, next_page)
                 }
             }
+            Text::Var(var_name) => {
+                let Some(var_value) = self.config().var(var_name) else {
+                    return false;
+                };
+                html.push_str(var_value.as_str());
+            }
         }
+        true
     }
 
     fn write_opening_tag(
@@ -258,7 +260,6 @@ impl<'p> PageWriter<'p> {
             }
             html.push('"');
         }
-        html.push_str(">\n");
     }
     fn write_closing_tag(
         &self,
@@ -280,8 +281,16 @@ impl<'p> PageWriter<'p> {
                 tag,
                 text,
                 raw_html,
+                attributes,
             } => {
                 self.write_opening_tag(html, tag, &element.classes);
+                for (name, value) in attributes {
+                    if let Some(value) = value.as_str() {
+                        let value = escape_attr(value);
+                        write!(html, r#" {name}="{value}""#)?;
+                    }
+                }
+                html.push_str(">\n");
                 if let Some(text) = text {
                     self.write_text(html, text);
                 }
@@ -292,6 +301,7 @@ impl<'p> PageWriter<'p> {
             }
             ElementContent::DomTree { tag, children } => {
                 self.write_opening_tag(html, tag, &element.classes);
+                html.push_str(">\n");
                 for child in children {
                     self.write_element(html, child)?;
                 }
@@ -338,28 +348,24 @@ impl<'p> PageWriter<'p> {
 
     fn write_nav_link(
         &self,
-        html: &mut String,
+        dest_html: &mut String,
         classes: &[String],
         link: &NavLink,
-    ) -> DdResult<()> {
-        let mut unexpanded = false;
+    ) -> DdResult<bool> {
+        let mut html = String::new();
         html.push_str("<a");
         if let Some(url) = &link.href {
             let url = self.project.link_url(url, self.page_path());
             if url.starts_with("--") {
                 // failed expansion (eg --previous on first page)
-                unexpanded = true;
-            } else {
-                write!(html, " href=\"{url}\"")?;
+                return Ok(false);
             }
+            write!(html, " href=\"{url}\"")?;
         }
         html.push_str(" class=\"nav-link ");
         for class in classes {
             html.push(' ');
             html.push_str(class);
-        }
-        if unexpanded {
-            html.push_str(" unexpanded");
         }
         html.push('\"');
         if let Some(target) = &link.target {
@@ -370,6 +376,10 @@ impl<'p> PageWriter<'p> {
             match part {
                 NavLinkPart::Img { src, alt } => {
                     let img_url = self.project.img_url(src, self.page_path());
+                    if img_url.starts_with("--") {
+                        // failed expansion (eg --logo with no logo configured)
+                        return Ok(false);
+                    }
                     write!(html, "<img src=\"{img_url}\"")?;
                     if let Some(alt) = alt {
                         let alt = escape_attr(alt);
@@ -397,12 +407,15 @@ impl<'p> PageWriter<'p> {
                 }
                 NavLinkPart::Label(label) => {
                     html.push_str("<span>");
-                    self.write_text(html, label);
+                    if !self.write_text(&mut html, label) {
+                        return Ok(false);
+                    }
                     html.push_str("</span>");
                 }
             }
         }
         html.push_str("</a>\n");
-        Ok(())
+        dest_html.push_str(&html);
+        Ok(true)
     }
 }

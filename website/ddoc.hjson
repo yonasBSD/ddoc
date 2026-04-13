@@ -1,14 +1,25 @@
 title: "ddoc"
 description: "Markdown based static site generator"
 favicon: img/favicon.ico
-ddoc-version: "0.16" // minimal version of ddoc
+// ddoc-version: "0.17" // minimal version of ddoc
+vars: {
+    github-url: https://github.com/Canop/ddoc
+}
+
+active-plugins: [
+    "dystroy-foss"
+    "theme-columns"
+    "toc-activate"
+    "search"
+]
 
 site-map: {
     Overview: index.md
     Usage: {
         "Install ddoc": install.md
-        "Setup your site": setup.md
-        "Edit your site": edit.md
+        "Setup": setup.md
+        "Plugins": plugins.md
+        "Edition": edit.md
         "Configuration": config.md
     }
     Community: {
@@ -17,69 +28,3 @@ site-map: {
     }
 }
 
-body: {
-    header: {
-        nav.before-menu: {
-            ddoc-link.external-nav-link: {
-                inline: img/dystroy-rust-white.svg
-                href: https://dystroy.org
-                alt: dystroy.org homepage
-            }
-            ddoc-link.home-link: {
-                href: /index.md
-                alt: ddoc homepage
-                label: ddoc
-            }
-        }
-        ddoc-menu: {
-            hamburger-checkbox: true
-        }
-        nav.after-menu: {
-            ddoc-link.search-opener: {
-                inline: img/ddoc-search.svg
-                href: --search
-                alt: Search
-            }
-            ddoc-link.external-nav-link.github: {
-                inline: img/github-mark.svg
-                alt: GitHub
-                href: https://github.com/Canop/ddoc
-            }
-        }
-    }
-    article: {
-        aside.page-nav: {
-            ddoc-toc: {
-                activate-visible-item: true
-            }
-        }
-        div.main-content: {
-            ddoc-main: {}
-            nav.prev-next: {
-                ddoc-link.previous-page-link: {
-                    inline: img/ddoc-left-arrow.svg
-                    href: --previous
-                    alt: Previous Page
-                    label: --previous-page-title
-                }
-                ddoc-link.next-page-link: {
-                    label: --next-page-title
-                    inline: img/ddoc-right-arrow.svg
-                    href: --next
-                    alt: Next Page
-                }
-            }
-            footer: {
-                div.made-with-ddoc: {
-                    ddoc-link: {
-                        label: made with
-                    }
-                    ddoc-link.link-to-ddoc: {
-                        label: ddoc
-                        href: https://dystroy.org/ddoc
-                    }
-                }
-            }
-        }
-    }
-}

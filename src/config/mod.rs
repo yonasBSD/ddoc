@@ -1,5 +1,4 @@
 mod attribute;
-mod before_0_11;
 mod element;
 mod element_key;
 mod element_list;
@@ -22,54 +21,59 @@ pub use {
 };
 
 use {
-    crate::*,
-    before_0_11::NavComponents,
-    serde::{
-        Deserialize,
-        Serialize,
+    crate::{
+        before_0_11::NavComponents,
+        *,
     },
-    std::path::{
-        Path,
-        PathBuf,
-    },
+    indexmap::IndexMap,
+    serde::Deserialize,
+    std::path::Path,
 };
 
 pub static CONFIG_FILE_NAME: &str = "ddoc.hjson";
 
 pub type ClassName = String;
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Default, Clone, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Config {
-    pub title: String,
+    pub title: Option<String>,
     pub description: Option<String>,
     pub ddoc_version: Option<String>,
-    #[serde(alias = "pages", alias = "menu")]
+    #[serde(default, alias = "active-plugins")]
+    pub active_plugins: Vec<String>,
+    #[serde(default, alias = "pages", alias = "menu")]
     pub site_map: PageList,
     pub favicon: Option<String>,
     /// for compatibility with ddoc (0.11-), this is loaded but only used
     /// through conversion to the new `body` field
     #[serde(flatten)]
-    old: NavComponents,
+    pub old: NavComponents,
     #[serde(default)]
     pub body: ElementList,
+    #[serde(default)]
+    pub vars: IndexMap<String, String>,
 }
 
 impl Config {
-    /// Read the ddoc.hjson configuration file at the root of a ddoc project
+    /// Read the ddoc.hjson configuration file at the root of a ddoc module
     ///
     /// Return both the config and the path where it was found
     ///
     /// # Errors
     /// Return `DdError::ConfigNotFound` if no ddoc.hjson is found at the specified path
     /// or other `DdError` variants on read/parse errors
-    pub fn at_root(path: &Path) -> DdResult<(Self, PathBuf)> {
+    pub fn in_dir(path: &Path) -> DdResult<Option<Sourced<Self>>> {
         let config_path = path.join(CONFIG_FILE_NAME);
         if !config_path.exists() {
-            return Err(DdError::ConfigNotFound);
+            return Ok(None);
         }
         let config: Config = read_file(&config_path)?;
-        Ok((config, config_path))
+        let config = Sourced::new(config, config_path);
+        Ok(Some(config))
+    }
+    pub fn title(&self) -> &str {
+        self.title.as_deref().unwrap_or("Untitled")
     }
     pub fn description(&self) -> Option<&str> {
         self.description.as_deref().filter(|s| !s.is_empty())
@@ -77,44 +81,46 @@ impl Config {
     pub fn favicon(&self) -> Option<&str> {
         self.favicon.as_deref().filter(|s| !s.is_empty())
     }
-    pub fn needs_search_script(&self) -> bool {
-        self.body.has_href("--search")
+    pub fn var(
+        &self,
+        name: &str,
+    ) -> Option<String> {
+        match name {
+            "title" => Some(self.title().to_string()),
+            "description" => self.description().map(|s| s.to_string()),
+            "favicon" => self.favicon().map(|s| s.to_string()),
+            _ => self.vars.get(name).cloned(),
+        }
     }
-    pub fn needs_toc_activate_script(&self) -> bool {
-        self.body.has(|element: &Element| {
-            if let ElementContent::Toc(toc) = &element.content {
-                return toc.activate_visible_item;
+
+    pub fn has_any_plugin(&self) -> bool {
+        !self.active_plugins.is_empty()
+    }
+
+    /// Add to this main config element the config of a plugin
+    pub fn merge(
+        &mut self,
+        other: &Config,
+    ) {
+        if self.title.is_none() {
+            self.title = other.title.clone();
+        }
+        if self.description.is_none() {
+            self.description = other.description.clone();
+        }
+        if self.favicon.is_none() {
+            self.favicon = other.favicon.clone();
+        }
+        for (key, value) in &other.vars {
+            if !self.vars.contains_key(key) {
+                self.vars.insert(key.clone(), value.clone());
             }
-            false
-        })
-    }
-    /// For support of old ddoc versions (<= 0.11), convert old nav components
-    /// if the new `body` field is empty
-    pub fn fix_old(&mut self) {
-        if self.body.children.is_empty() {
-            self.body = self.old.to_body_composite();
         }
-    }
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct UiOptions {
-    /// If true, a hamburger checkbox is added to the UI for toggling
-    /// the menu on small screens.
-    ///
-    /// When it's true (default), CSS becomes necessary
-    #[serde(default = "bool_true")]
-    hamburger_checkbox: bool,
-}
-
-impl Default for UiOptions {
-    fn default() -> Self {
-        Self {
-            hamburger_checkbox: true,
+        for plugin in &other.active_plugins {
+            if !self.active_plugins.contains(plugin) {
+                self.active_plugins.push(plugin.clone());
+            }
         }
+        self.body.merge(&other.body);
     }
-}
-
-pub fn bool_true() -> bool {
-    true
 }

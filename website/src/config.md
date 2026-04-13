@@ -54,6 +54,8 @@ For example all pages of the ddoc documentation site are at the same depth URL-w
 
 The `body` configuration part defines the HTML layout.
 
+It's usually defined in a theming plugin, but may be enriched with other elements in the main `ddod.hjson` file.
+
 Its structure is a map of `tag.classes` or `ddoc-element.classes`.
 
 For example, given the following `body` configuration part:
@@ -92,7 +94,7 @@ The generated `<body>` of a page will look like this:
 </body>
 ```
 
-The `body` of the default ddoc.hjson file contains more parts than this example, so that pages have a menu, a table of content, etc.
+The `body` of the ddoc.hjson file of one of a theming plugin contains more parts than this example, so that pages have a menu, a table of content, etc.
 
 ## text/html content of an element
 
@@ -172,19 +174,11 @@ Example:
 ```Hjson
 article: {
     aside.page-nav: {
-        ddoc-toc: {
-            activate-visible-item: true
-        }
+        ddoc-toc: {}
     }
     ddoc-main: {}
 }
 ```
-
-### Active TOC item
-
-When `activate-visible-item` is `true`, a script is injected in the page so that the TOC follows scroll and selection.
-
-If you don't want this feature, or if you want to use your own script for that, set this property to `false`.
 
 ### TOC depth
 

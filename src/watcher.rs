@@ -41,6 +41,27 @@ pub enum FileChange {
     Other,
 }
 
+/// Something that should be watched for changes to trigger a rebuild of the project
+pub struct WatchTarget {
+    pub path: PathBuf,
+    pub recursive: bool, // ie directory or not
+}
+
+impl WatchTarget {
+    pub fn new_dir<P: Into<PathBuf>>(path: P) -> Self {
+        Self {
+            path: path.into(),
+            recursive: true,
+        }
+    }
+    pub fn new_file<P: Into<PathBuf>>(path: P) -> Self {
+        Self {
+            path: path.into(),
+            recursive: false,
+        }
+    }
+}
+
 /// watch for file changes to keep a project up to date
 ///
 /// Caller should keep the returned watcher alive (e.g., by storing it in a variable)
@@ -51,8 +72,6 @@ pub fn rebuild_on_change(
 ) -> Result<RecommendedWatcher, notify::Error> {
     let skip = Arc::new(AtomicBool::new(false));
     let snd_skip = skip.clone();
-    let config_path = project.config_path.clone();
-    let src_path = project.src_path.clone();
     //let (snd, rcv) = mpsc::sync_channel::<FileChange>(100);
     let (snd, rcv) = channel::unbounded::<FileChange>();
     let mut watcher =
@@ -114,8 +133,16 @@ pub fn rebuild_on_change(
             }
             Err(e) => warn!("watch error: {e:?}"),
         })?;
-    watcher.watch(&config_path, RecursiveMode::NonRecursive)?;
-    watcher.watch(&src_path, RecursiveMode::Recursive)?;
+    for target in project.watch_targets() {
+        watcher.watch(
+            &target.path,
+            if target.recursive {
+                RecursiveMode::Recursive
+            } else {
+                RecursiveMode::NonRecursive
+            },
+        )?;
+    }
     // start the build thread
     thread::spawn(move || {
         let debounce_delay = std::time::Duration::from_millis(DEBOUNCE_DELAY_MS);

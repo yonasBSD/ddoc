@@ -34,16 +34,11 @@ Summarizing the goals and features of **ddoc**:
 * All internal links are relative, ddoc doesn't need to know the base url of the site
 * Integrated search function - but you can replace it with your own
 
-# Why NOT use ddoc
-
-* ddoc assumes you want to write or tune, then own, your CSS, not choose among themes
-* ddoc has no templating system - it doesn't suit every need
-* ddoc has no plugin system
-
 # Getting started
 
 * [Install ddoc](install)
 * [Setup your site](setup)
+* [Understand plugins](plugins)
 * [Edit your site](edit)
 * [Look at examples](examples)
 
