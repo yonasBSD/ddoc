@@ -54,6 +54,9 @@ body, div, nav, main {
         width: calc(50% - 430px);
         min-width: 200px;
     }
+    div.page {
+        width: calc(50% + 430px);
+    }
     div.main-container {
         flex: 0 0 850px;
     }
