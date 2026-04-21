@@ -1,7 +1,7 @@
-:root {
+body {
 	--text: #444;
 	--accent: #000;
-	--bg: #fdfdfd;
+	--left-bg: #fcfcfc;
 	--nav-bg: #eee;
 	--nav-fg: #333;
 	--header-border: thin solid #bbb;

@@ -1,6 +1,7 @@
 :root {
-    --bubble-bg: #ccc;
-    --bubble-color: #fff;
+    --bubble-bg: #f8f8f8;
+    --bubble-border-color: #ddd;
+    --bubble-border: solid 1px var(--bubble-border-color);
 }
 
 .image-strip {
@@ -16,6 +17,7 @@
     flex: 1 1 0;
     min-width: 0;
 }
+
 .image-bubble {
     display: none;
     position: absolute;
@@ -23,11 +25,13 @@
     right: 0;
     z-index: 10;
     background: var(--bubble-bg);
+    border: var(--bubble-border);
     border-radius: 8px;
     padding: 8px;
     text-align: center;
 }
 
+.image-bubble::before,
 .image-bubble::after {
     content: '';
     position: absolute;
@@ -37,14 +41,22 @@
 }
 
 .image-bubble.above { bottom: calc(100% + 10px); }
+.image-bubble.above::before {
+    bottom: -21px;
+    border-top-color: var(--bubble-border-color);
+}
 .image-bubble.above::after {
-    bottom: -20px;
+    bottom: -19px;
     border-top-color: var(--bubble-bg);
 }
 
 .image-bubble.below { top: calc(100% + 10px); }
+.image-bubble.below::before {
+    top: -21px;
+    border-bottom-color: var(--bubble-border-color);
+}
 .image-bubble.below::after {
-    top: -20px;
+    top: -19px;
     border-bottom-color: var(--bubble-bg);
 }
 
@@ -54,4 +66,3 @@
     object-fit: contain;
     border-radius: 4px;
 }
-

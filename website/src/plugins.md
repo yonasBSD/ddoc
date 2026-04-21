@@ -49,7 +49,7 @@ active-plugins: [
 
 # How to deal with plugins
 
-A plugin is part of your site, you should put it in version control to ensure you'll be able to restore the site exactly as it was.
+A plugin you added to your site is part of it, you should put it in version control to ensure you'll be able to restore the site exactly as it was.
 
 A theming plugin is usually just a starting point: it's unlikely you want your site to be exactly as the plugin makes it.
 

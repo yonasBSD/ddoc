@@ -4,13 +4,13 @@
 
 **ddoc** is a markdown based static site generator.
 
-**ddoc** powers the documentations of [broot](https://dystroy.org/broot), [bacon](https://dystroy.org/bacon), [rhit](https://dystroy.org/rhit), [dysk](https://dystroy.org/dysk), [safecloset](https://dystroy.org/safecloset).
+**ddoc** powers the documentations of [bacon](https://dystroy.org/bacon), [broot](https://dystroy.org/broot), [dysk](https://dystroy.org/dysk), [rhit](https://dystroy.org/rhit), [safecloset](https://dystroy.org/safecloset).
 
 <div class=image-strip>
-    <img src=img/thumb-broot.png>
     <img src=img/thumb-bacon.png>
-    <img src=img/thumb-rhit.png>
+    <img src=img/thumb-broot.png>
     <img src=img/thumb-dysk.png>
+    <img src=img/thumb-rhit.png>
     <img src=img/thumb-safecloset.png>
 </div>
 
