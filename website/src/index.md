@@ -6,6 +6,14 @@
 
 **ddoc** powers the documentations of [broot](https://dystroy.org/broot), [bacon](https://dystroy.org/bacon), [rhit](https://dystroy.org/rhit), [dysk](https://dystroy.org/dysk), [safecloset](https://dystroy.org/safecloset).
 
+<div class=image-strip>
+    <img src=img/thumb-broot.png>
+    <img src=img/thumb-bacon.png>
+    <img src=img/thumb-rhit.png>
+    <img src=img/thumb-dysk.png>
+    <img src=img/thumb-safecloset.png>
+</div>
+
 **ddoc** makes sense when you want a simple site, such as this one, with a site-wide navigation menu, a table of content on every page, and you want to be confident the style you defined won't be broken at every release of the tool.
 
 **ddoc** aims to have the simplest and fastest installation and configuration process, after which you just have to add markdown files and edit your CSS in a standard and obvious way.

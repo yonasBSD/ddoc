@@ -1,0 +1,57 @@
+:root {
+    --bubble-bg: #ccc;
+    --bubble-color: #fff;
+}
+
+.image-strip {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 10px;
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.image-strip img {
+    flex: 1 1 0;
+    min-width: 0;
+}
+.image-bubble {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: var(--bubble-bg);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+}
+
+.image-bubble::after {
+    content: '';
+    position: absolute;
+    left: var(--arrow-x, 50%);
+    transform: translateX(-50%);
+    border: 10px solid transparent;
+}
+
+.image-bubble.above { bottom: calc(100% + 10px); }
+.image-bubble.above::after {
+    bottom: -20px;
+    border-top-color: var(--bubble-bg);
+}
+
+.image-bubble.below { top: calc(100% + 10px); }
+.image-bubble.below::after {
+    top: -20px;
+    border-bottom-color: var(--bubble-bg);
+}
+
+.image-bubble img {
+    max-width: 100%;
+    max-height: 50vh;
+    object-fit: contain;
+    border-radius: 4px;
+}
+

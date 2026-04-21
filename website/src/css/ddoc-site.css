@@ -46,3 +46,10 @@ footer .made-with-ddoc a.nav-link.link-to-ddoc:hover {
 	opacity: 0.8;
 	text-decoration: underline;
 }
+
+div.page,
+div.main-container,
+main {
+    min-width: 0;
+}
+

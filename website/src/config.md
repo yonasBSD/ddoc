@@ -2,6 +2,8 @@ The ddoc.hjson file, at the root of the website folder, describes the site map a
 
 It's a [Hjson](https://hjson.github.io/) file.
 
+You may write a complete site without even having to read this page, by just having a short look at the configuration and edit the list of pages and a few properties and fill in the list of pages, but if you want to know more, here's the reference.
+
 # Global Properties
 
 Those simple properties used to build the `<head>` element:

@@ -34,6 +34,12 @@ links.
 In both cases, ddoc will rewrite the image URL to point to the correct location whatever
 the depth of the page including the image. Your reference just has to start with `img/`.
 
+# More than just Markdown
+
+When Markdown isn't enough, you can insert HTML in your md file, add dedicated styling or scripts.
+
+For example, the small strip of images in the [Overview](..) page is a small `<div class=image-strip>...` insert relying on dedicated `css/image-strip.css` and `js/image-strip.js` files.
+
 # Links
 
 ## Links to pages
