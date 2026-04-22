@@ -41,8 +41,9 @@
     --nav-not-selected-border: 5px solid transparent;
 }
 
-body, div, nav, main {
+body, div, nav, main, pre {
     min-height: 0;
+    min-width: 0;
     margin: 0;
     padding: 0;
     color: var(--text);
