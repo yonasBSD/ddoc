@@ -7,7 +7,7 @@ use {
 };
 
 /// The settings for the insertion of a menu in a web page.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Menu {
     pub hamburger_checkbox: bool,
 }

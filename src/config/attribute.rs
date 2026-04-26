@@ -6,7 +6,7 @@ use {
 pub type AttributeKey = String;
 
 /// The value of an attribute in a ddoc element (`ddoc-link`, `ddoc-menu`, etc).
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 pub enum AttributeValue {
     String(String),

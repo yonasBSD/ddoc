@@ -39,7 +39,7 @@ enum NavComponent {
 impl NavComponents {
     /// Build a `ElementList` from old-style `NavComponents`, adding the
     /// parts which were implicit in ddoc <= 0.11
-    pub fn to_body_composite(&self) -> ElementList {
+    pub fn to_body_composite(&self) -> Element {
         let mut children = Vec::new();
         if !self.header.is_empty() {
             children.push(Element::new_composite(
@@ -63,7 +63,13 @@ impl NavComponents {
                 self.footer.to_children(&self.ui),
             ));
         }
-        ElementList { children }
+        Element {
+            classes: vec![],
+            content: ElementContent::DomTree {
+                tag: "body".to_string(),
+                children,
+            },
+        }
     }
 }
 impl NavDir {

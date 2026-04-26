@@ -5,14 +5,14 @@ use {
 };
 
 /// A single link in the navigation bar
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct NavLink {
     pub href: Option<String>,
     pub target: Option<String>,
     pub content: Vec<NavLinkPart>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum NavLinkPart {
     Label(Text),
     Img { src: String, alt: Option<String> },

@@ -17,7 +17,7 @@ fn config_needs_search_script(config: &Config) -> bool {
 }
 // compatibility with old ddoc pre-plugin system
 fn config_needs_toc_activate_script(config: &Config) -> bool {
-    config.body.has(|element: &Element| {
+    config.body.has(&mut |element: &Element| {
         if let ElementContent::Toc(toc) = &element.content {
             return toc.activate_visible_item;
         }

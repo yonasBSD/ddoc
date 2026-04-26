@@ -26,7 +26,10 @@ use {
         *,
     },
     indexmap::IndexMap,
-    serde::Deserialize,
+    serde::{
+        Deserialize,
+        Deserializer,
+    },
     std::path::Path,
 };
 
@@ -49,8 +52,11 @@ pub struct Config {
     /// through conversion to the new `body` field
     #[serde(flatten)]
     pub old: NavComponents,
-    #[serde(default)]
-    pub body: ElementList,
+    #[serde(
+        default = "default_body_element",
+        deserialize_with = "deserialize_body_element"
+    )]
+    pub body: Element,
     #[serde(default)]
     pub vars: IndexMap<String, String>,
 }
@@ -121,6 +127,33 @@ impl Config {
                 self.active_plugins.push(plugin.clone());
             }
         }
-        self.body.merge(&other.body);
+        if !self.body.try_merge(&other.body) {
+            warn!(
+                "Plugin config body could not be merged into main config body, plugin body will be ignored"
+            );
+        }
     }
+}
+
+fn default_body_element() -> Element {
+    Element {
+        classes: vec![],
+        content: ElementContent::DomTree {
+            tag: "body".to_string(),
+            children: vec![],
+        },
+    }
+}
+fn deserialize_body_element<'de, D: Deserializer<'de>>(
+    deserializer: D
+) -> Result<Element, D::Error> {
+    let element_list = ElementList::deserialize(deserializer)?;
+    let element = Element {
+        classes: vec![],
+        content: ElementContent::DomTree {
+            tag: "body".to_string(),
+            children: element_list.children,
+        },
+    };
+    Ok(element)
 }

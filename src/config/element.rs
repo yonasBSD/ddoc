@@ -1,12 +1,12 @@
 use crate::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Element {
     pub classes: Vec<ClassName>,
     pub content: ElementContent,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ElementContent {
     DomLeaf {
         tag: String,
@@ -27,10 +27,21 @@ pub enum ElementContent {
 }
 
 impl Element {
+    pub fn is_empty(&self) -> bool {
+        match &self.content {
+            ElementContent::DomTree { children, .. } => children.is_empty(),
+            _ => false,
+        }
+    }
     pub fn try_merge(
         &mut self,
         other: &Element,
     ) -> bool {
+        struct RankedSelectorElement {
+            selector: String,
+            merged_element: Element,
+            rank: usize,
+        }
         match (&mut self.content, &other.content) {
             (
                 ElementContent::DomTree {
@@ -42,18 +53,31 @@ impl Element {
                     ..
                 },
             ) => {
-                for element in children2 {
-                    let mut merged = false;
-                    let selector2 = element.selector();
-                    for element1 in children1.iter_mut() {
-                        if element1.selector() == selector2 {
-                            merged |= element1.try_merge(element);
-                            break;
+                let mut merged_elements = Vec::new();
+                for (i, e1) in children1.drain(..).enumerate() {
+                    merged_elements.push(RankedSelectorElement {
+                        selector: e1.selector(),
+                        merged_element: e1,
+                        rank: i,
+                    });
+                }
+                for (i, e2) in children2.iter().enumerate() {
+                    let selector = e2.selector();
+                    if let Some(e1) = merged_elements.iter_mut().find(|e| e.selector == selector) {
+                        if e1.merged_element.try_merge(e2) {
+                            e1.rank = i.max(e1.rank);
+                            continue;
                         }
                     }
-                    if !merged {
-                        children1.push(element.clone());
-                    }
+                    merged_elements.push(RankedSelectorElement {
+                        selector,
+                        merged_element: e2.clone(),
+                        rank: i,
+                    });
+                }
+                merged_elements.sort_by_key(|e| e.rank);
+                for e in merged_elements {
+                    children1.push(e.merged_element);
                 }
                 true
             }
@@ -103,6 +127,19 @@ impl Element {
             }
         }
     }
+    pub fn has_href(
+        &self,
+        href: &str,
+    ) -> bool {
+        self.has(&mut |element: &Element| {
+            if let ElementContent::Link(link) = &element.content {
+                if link.href.as_deref() == Some(href) {
+                    return true;
+                }
+            }
+            false
+        })
+    }
     pub fn has<F>(
         &self,
         f: &mut F,
@@ -130,6 +167,42 @@ impl Element {
         }
         selector
     }
+
+    /// Print this element and its children in a human-readable way, for debugging purposes
+    pub fn println(
+        &self,
+        label: &str,
+    ) {
+        print!("{}: ", label);
+        self.print();
+        println!();
+    }
+    /// Print this element and its children in a human-readable way, for debugging purposes
+    fn print(&self) {
+        print!("{}", self.selector());
+        if let Some(children) = self.children() {
+            if !children.is_empty() {
+                print!("( ");
+                for child in children {
+                    child.print();
+                    print!(" ");
+                }
+                print!(")");
+            }
+        }
+    }
+}
+
+impl Default for Element {
+    fn default() -> Self {
+        Self {
+            classes: vec![],
+            content: ElementContent::DomTree {
+                tag: "div".to_string(),
+                children: vec![],
+            },
+        }
+    }
 }
 
 impl From<ElementContent> for Element {
@@ -139,4 +212,38 @@ impl From<ElementContent> for Element {
             content,
         }
     }
+}
+
+// Check that the order of children is preserved when merging two elements with overlapping
+// children (i.e. same selector)
+#[test]
+fn test_merge_order() {
+    let e1 = Element::new_composite(
+        "div.container",
+        vec![
+            Element::new_composite("div.a", vec![]),
+            Element::new_composite("div.b", vec![]),
+        ],
+    );
+    let e2 = Element::new_composite(
+        "div.container",
+        vec![
+            Element::new_composite("div.b", vec![]),
+            Element::new_composite("div.c", vec![]),
+        ],
+    );
+    let m = Element::new_composite(
+        "div.container",
+        vec![
+            Element::new_composite("div.a", vec![]),
+            Element::new_composite("div.b", vec![]),
+            Element::new_composite("div.c", vec![]),
+        ],
+    );
+    let mut e12 = e1.clone();
+    assert!(e12.try_merge(&e2));
+    assert_eq!(e12, m);
+    let mut e21 = e2.clone();
+    assert!(e21.try_merge(&e1));
+    assert_eq!(e21, m);
 }

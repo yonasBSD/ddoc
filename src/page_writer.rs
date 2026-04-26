@@ -134,7 +134,7 @@ impl<'p> PageWriter<'p> {
             write!(html, " plugin-{name}")?;
         }
         writeln!(html, "\">\n")?;
-        self.write_html_element_list(html, &self.config().body)?;
+        self.write_element(html, &self.config().body)?;
         html.push_str("</html>\n");
         Ok(())
     }
@@ -186,18 +186,6 @@ impl<'p> PageWriter<'p> {
             )?;
         }
         html.push_str("</head>\n");
-        Ok(())
-    }
-
-    /// Write the HTML for the content of a `ElementList`
-    fn write_html_element_list(
-        &self,
-        html: &mut String,
-        composite: &ElementList,
-    ) -> DdResult<()> {
-        for element in &composite.children {
-            self.write_element(html, element)?;
-        }
         Ok(())
     }
 
