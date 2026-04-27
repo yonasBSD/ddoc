@@ -176,11 +176,17 @@ Example:
 ```Hjson
 article: {
     aside.page-nav: {
-        ddoc-toc: {}
+        ddoc-toc: {
+            title: "on this page:"
+        }
     }
     ddoc-main: {}
 }
 ```
+
+If you don't specify a title, the title of the page will be used.
+
+(if you really don't want a title for the TOC, you may specify `.page-toc .toc-title { display: none; }` in CSS)
 
 ### TOC depth
 

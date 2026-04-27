@@ -7,8 +7,11 @@ use {
 };
 
 /// The settings for the insertion of a table of content in a web page.
-#[derive(Debug, Clone, Copy, Default, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct Toc {
+    /// The title of the table of content. If not specified, the default title is the
+    /// title of the current page.
+    pub title: Option<String>,
     // This is used for compatiblity with ddoc before 0.17
     // (for later version, enable the toc-activate plugin instead, which is more powerful and
     // doesn't require a special script)
@@ -22,6 +25,7 @@ impl FromStr for Toc {
             return Err("Toc must be 'toc'");
         }
         Ok(Self {
+            title: None,
             activate_visible_item: true,
         })
     }
@@ -36,6 +40,11 @@ impl From<Attributes> for Toc {
         {
             if let Some(b) = v.as_bool() {
                 toc_insert.activate_visible_item = b;
+            }
+        }
+        if let Some(v) = map.get("title") {
+            if let Some(s) = v.as_str() {
+                toc_insert.title = Some(s.to_string());
             }
         }
         toc_insert
